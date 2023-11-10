@@ -29,21 +29,24 @@ export const useFlowFieldStore = defineStore('flowFieldStore', {
 
   actions: {
     setLightColor(hex) {
-      console.log('setting light color', hex)
+      // console.log('setting light color', hex)
       this.lightColor = hex
     },
     setDarkColor(hex) {
-      console.log('setting dark color', hex)
+      // console.log('setting dark color', hex)
       this.darkColor = hex
     },
     setPerlinScaleFactor(n) {
-      console.log('setting dark color', n)
+      // console.log('setting dark color', n)
       this.perlinScaleFactor = n
     },
     setNewRandomTime() {
-      this.time = Math.random() * 100000
+      let time = Math.random() * 100000
+      // console.log('setting new random time',time)
+      this.time = time
     },
     setBrushSize(brushSize) {
+      // console.log('setting brush size',brushSize)
       this.brushSize = brushSize
     },
   },
