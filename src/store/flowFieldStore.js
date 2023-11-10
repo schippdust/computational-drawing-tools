@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-
+import { hexToRgb } from './storeUtils'
 export const useFlowFieldStore = defineStore('flowFieldStore', {
   state: () => ({
     lightColor: '#D5D5D5',
@@ -18,7 +18,14 @@ export const useFlowFieldStore = defineStore('flowFieldStore', {
     canvasHeight: 4400,
   }),
 
-  getters: {},
+  getters: {
+    lightColorRgbObject() {
+      return hexToRgb(this.lightColor)
+    },
+    darkColorRgbObject() {
+      return hexToRgb(this.darkColor)
+    },
+  },
 
   actions: {
     setLightColor(hex) {

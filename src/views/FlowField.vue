@@ -73,7 +73,7 @@
 
 <script setup>
 let lightColorRgbObject = ''
-import FlowFieldCanvas from '@/components/FlowFieldCanvas.vue'
+import FlowFieldCanvas from '@/components/flowField/FlowFieldCanvas.vue'
 import { useFlowFieldStore } from '@/store/flowFieldStore'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -111,36 +111,36 @@ function setNewRandomTime() {
   flowFieldStore.setNewRandomTime()
 }
 
-function decrementNoiseScale() {}
+// function decrementNoiseScale() {}
 
-function incrementNoiseScale() {}
+// function incrementNoiseScale() {}
 
-function rgbaToCss(rgbaArray) {
-  return (
-    'rgba(' +
-    rgbaArray[0] +
-    ', ' +
-    rgbaArray[1] +
-    ', ' +
-    rgbaArray[2] +
-    ', ' +
-    rgbaArray[3] +
-    ')'
-  )
-}
+// function rgbaToCss(rgbaArray) {
+//   return (
+//     'rgba(' +
+//     rgbaArray[0] +
+//     ', ' +
+//     rgbaArray[1] +
+//     ', ' +
+//     rgbaArray[2] +
+//     ', ' +
+//     rgbaArray[3] +
+//     ')'
+//   )
+// }
 
-function rgbaToHex(rgbaArray) {
-  let r = (+rgbaArray[0]).toString(16),
-    g = (+rgbaArray[1]).toString(16),
-    b = (+rgbaArray[2]).toString(16),
-    a = Math.round(+rgbaArray[3] * 255).toString(16)
+// function rgbaToHex(rgbaArray) {
+//   let r = (+rgbaArray[0]).toString(16),
+//     g = (+rgbaArray[1]).toString(16),
+//     b = (+rgbaArray[2]).toString(16),
+//     a = Math.round(+rgbaArray[3] * 255).toString(16)
 
-  if (r.length == 1) r = '0' + r
-  if (g.length == 1) g = '0' + g
-  if (b.length == 1) b = '0' + b
-  if (a.length == 1) a = '0' + a
-  console.log('#' + r + g + b + a)
-  return '#' + r + g + b + a
-}
-console.log('initialized flow field component')
+//   if (r.length == 1) r = '0' + r
+//   if (g.length == 1) g = '0' + g
+//   if (b.length == 1) b = '0' + b
+//   if (a.length == 1) a = '0' + a
+//   console.log('#' + r + g + b + a)
+//   return '#' + r + g + b + a
+// }
+// console.log('initialized flow field component')
 </script>
