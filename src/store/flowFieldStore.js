@@ -2,8 +2,9 @@ import { defineStore } from 'pinia'
 
 export const useFlowFieldStore = defineStore('flowFieldStore', {
   state: () => ({
-    darkColor: [20, 20, 20, 1],
-    lightColor: [200, 200, 200, 1],
+    lightColor: '#D5D5D5',
+    darkColor: '#3D3D3D',
+
     perlinScaleStep: 0.007,
     perlinScaleBaseline: 0.0003,
     perlinScaleFactor: 0.001,
@@ -17,29 +18,26 @@ export const useFlowFieldStore = defineStore('flowFieldStore', {
     canvasHeight: 4400,
   }),
 
-  getters: {
-    lightColorRgbObject(){
-      let c = this.lightColor
-      return {r:c[0],g:c[1],b:c[2],a:c[3]}
-    },
-    lightColorRgbObject(){
-      let c = this.lightColor
-      return {r:c[0],g:c[1],b:c[2],a:c[3]}
-    }
-  },
+  getters: {},
 
   actions: {
-    setLightColor(rgba) {
-      console.log('setting light color',rgba)
+    setLightColor(hex) {
+      console.log('setting light color', hex)
+      this.lightColor = hex
     },
-    setDarkColor(rgba) {
-      console.log('setting dark color',rgba)
+    setDarkColor(hex) {
+      console.log('setting dark color', hex)
+      this.darkColor = hex
     },
     setPerlinScaleFactor(n) {
-      console.log('setting dark color',n)
+      console.log('setting dark color', n)
+      this.perlinScaleFactor = n
     },
-    setNewRandomTime(){
+    setNewRandomTime() {
       this.time = Math.random() * 100000
-    }
+    },
+    setBrushSize(brushSize) {
+      this.brushSize = brushSize
+    },
   },
 })

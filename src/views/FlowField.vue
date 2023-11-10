@@ -1,6 +1,6 @@
 <template>
-  <v-container class="" elevation10>
-    <v-row justify="start" class="pa-1 mt-0">
+  <v-container class="mx-0 px-0" fluid elevation10>
+    <v-row justify="start" class="pa-1 mt-n4">
       <v-col md="1" class="py-0 text-center">
         <v-btn
           class="pa-0"
@@ -8,7 +8,7 @@
           color="black"
           dark
           title="Randomize Noise"
-          @click=""
+          @click="setNewRandomTime()"
         >
           <v-icon class="ma-0">mdi-dice-3-outline</v-icon>
         </v-btn>
@@ -19,7 +19,7 @@
       <v-col md="2" class="py-0">
         <v-menu :close-on-content-click="false" :open-on-hover="true">
           <template v-slot:activator="{ props }">
-            <v-btn block :color="'blue'" dark v-bind="props" v-on="on">
+            <v-btn block :color="lightColor" dark v-bind="props">
               Light Color
             </v-btn>
           </template>
@@ -28,7 +28,8 @@
             elevation="10"
             hide-mode-switch
             mode="rgba"
-            @input="setLightColor($event)"
+            :model-value="lightColor"
+            @update:model-value="setLightColor($event)"
           />
         </v-menu>
       </v-col>
@@ -36,7 +37,7 @@
       <v-col md="2" class="py-0">
         <v-menu :close-on-content-click="false" :open-on-hover="true">
           <template v-slot:activator="{ props }">
-            <v-btn block :color="'blue-darken-4'" dark v-bind="props" v-on="on">
+            <v-btn block :color="darkColor" dark v-bind="props">
               Dark Color
             </v-btn>
           </template>
@@ -45,7 +46,8 @@
             elevation="10"
             hide-mode-switch
             mode="rgba"
-            @input="setDarkColor($event)"
+            :model-value="darkColor"
+            @update:model-value="setDarkColor($event)"
           />
         </v-menu>
       </v-col>
@@ -55,11 +57,12 @@
       <v-col md="3" class="mb-n5 py-1">
         <v-slider
           label="Brush Size"
-          :min="10"
-          :max="40"
+          :min="minBrushSize"
+          :max="maxBrushSize"
+          :model-value="brushSize"
           color="grey-darken-3"
           track-color="grey-lighten-1"
-          @change="setBrushSize($event)"
+          @end="setBrushSize($event)"
         />
       </v-col>
     </v-row>
@@ -71,21 +74,41 @@
 <script setup>
 let lightColorRgbObject = ''
 import FlowFieldCanvas from '@/components/FlowFieldCanvas.vue'
+import { useFlowFieldStore } from '@/store/flowFieldStore'
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+
+const flowFieldStore = useFlowFieldStore()
+const {
+  darkColor,
+  lightColor,
+  perlinScaleStep,
+  perlinScaleBaseline,
+  perlinScaleFactor,
+  time,
+  brushSize,
+  minBrushSize,
+  maxBrushSize,
+} = storeToRefs(flowFieldStore)
 
 function setLightColor(event) {
-  console.log(event)
+  console.log('set light color', event)
+  flowFieldStore.setLightColor(event)
 }
 
 function setDarkColor(event) {
-  console.log(event)
+  console.log('set dark color', event)
+  flowFieldStore.setDarkColor(event)
 }
 
 function setBrushSize(event) {
-  console.log(event)
+  console.log('set brush size', event)
+  flowFieldStore.setBrushSize(event)
 }
 
-function setNewRandomTime(event) {
-  console.log(event)
+function setNewRandomTime() {
+  console.log('set new random time')
+  flowFieldStore.setNewRandomTime()
 }
 
 function decrementNoiseScale() {}
