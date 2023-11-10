@@ -1,3 +1,13 @@
+<script setup>
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAppStore } from '@/store/app'
+
+const appStore = useAppStore()
+
+const { pages } = storeToRefs(appStore)
+</script>
+
 <template>
   <v-container>
     <v-row>
@@ -14,13 +24,3 @@
     </v-row>
   </v-container>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useAppStore } from '@/store/app'
-
-const appStore = useAppStore()
-
-const { pages } = storeToRefs(appStore)
-</script>

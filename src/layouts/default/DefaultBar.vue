@@ -1,3 +1,7 @@
+<script setup>
+//
+</script>
+
 <template>
   <v-app-bar location="bottom" flat height="20" color="grey-lighten-2">
     <v-app-bar-title class="text-caption">
@@ -8,7 +12,3 @@
     >
   </v-app-bar>
 </template>
-
-<script setup>
-//
-</script>

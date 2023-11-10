@@ -1,3 +1,7 @@
+<script setup>
+import DefaultBar from './DefaultBar.vue'
+</script>
+
 <template>
   <v-app>
     <default-bar />
@@ -6,7 +10,3 @@
     </v-main>
   </v-app>
 </template>
-
-<script setup>
-import DefaultBar from './DefaultBar.vue'
-</script>
