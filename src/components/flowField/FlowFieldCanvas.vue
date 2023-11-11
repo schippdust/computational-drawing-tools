@@ -82,7 +82,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-container class="pa-0 ma-0" fluid>
+  <v-container class="pa-0 ma-0" fluid style="overflow-x: auto !important">
     <v-row class="pa-0 ma-0">
       <v-col class="pa-0 ma-0">
         <div id="canvas" class=""></div>
