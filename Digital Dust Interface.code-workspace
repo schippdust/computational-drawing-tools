@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "../../course-schedule-builder"
+		},
+		{
+			"path": "../Digital Dust"
 		}
 	],
 	"settings": {}

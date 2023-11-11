@@ -25,4 +25,16 @@ function hexToRgb(hex) {
   return { r, g, b }
 }
 
-export { fullHexFromShort, hexToRgb }
+function getNowAsString() {
+  let d = Date.now()
+  let time = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  }).format(d)
+  return time
+}
+
+export { fullHexFromShort, hexToRgb, getNowAsString }

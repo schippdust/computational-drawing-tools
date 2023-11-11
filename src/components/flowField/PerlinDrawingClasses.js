@@ -16,7 +16,7 @@ class PerlinPathCollection {
         this.paths.splice(i, 1)
         continue
       }
-      path.noisyMovement(this.time)
+      path.noisyMovement(_time)
       path.draw()
 
       path.age++
@@ -52,11 +52,11 @@ class PerlinPath {
     // console.log(_fillColor);
   }
 
-  noisyMovement() {
+  noisyMovement(time) {
     let noiseRadians = this.s.map(
       this.s.noise(
-        this.x * this.noiseScale,
-        (this.y + this.ytOffset) * this.noiseScale,
+        this.x * this.noiseScale + time,
+        (this.y + this.ytOffset) * this.noiseScale + time,
       ),
       0,
       1,
