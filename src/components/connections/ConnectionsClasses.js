@@ -1,5 +1,8 @@
+import P5 from 'p5'
+
 class VehicleQuadTree {
-  constructor(boundary, capacity) {
+  constructor(boundary, capacity, sketch) {
+    this.s = sketch
     this.boundary = boundary // Rectangle representing the boundary of this quadtree
     this.capacity = capacity // Maximum number of vehicles in a quadtree node
     this.vehicles = [] // Array to hold vehicles in this quadtree
@@ -38,15 +41,15 @@ class VehicleQuadTree {
     let w = this.boundary.w / 2
     let h = this.boundary.h / 2
 
-    let ne = new Rectangle(x + w, y, w, h)
-    let nw = new Rectangle(x, y, w, h)
-    let se = new Rectangle(x + w, y + h, w, h)
-    let sw = new Rectangle(x, y + h, w, h)
+    let ne = new Rectangle(x + w, y, w, h, this.s)
+    let nw = new Rectangle(x, y, w, h, this.s)
+    let se = new Rectangle(x + w, y + h, w, h, this.s)
+    let sw = new Rectangle(x, y + h, w, h, this.s)
 
-    this.northeast = new VehicleQuadTree(ne, this.capacity)
-    this.northwest = new VehicleQuadTree(nw, this.capacity)
-    this.southeast = new VehicleQuadTree(se, this.capacity)
-    this.southwest = new VehicleQuadTree(sw, this.capacity)
+    this.northeast = new VehicleQuadTree(ne, this.capacity, this.s)
+    this.northwest = new VehicleQuadTree(nw, this.capacity, this.s)
+    this.southeast = new VehicleQuadTree(se, this.capacity, this.s)
+    this.southwest = new VehicleQuadTree(sw, this.capacity, this.s)
 
     this.divided = true
   }
@@ -132,11 +135,12 @@ class VehicleQuadTree {
 }
 
 class Rectangle {
-  constructor(x, y, w, h) {
+  constructor(x, y, w, h, sketch) {
     this.x = x
     this.y = y
     this.w = w
     this.h = h
+    this.s = sketch
   }
 
   // Check if the rectangle contains a point
@@ -154,7 +158,7 @@ class Rectangle {
     let closestX = clamp(point.x, this.x, this.x + this.w)
     let closestY = clamp(point.y, this.y, this.y + this.h)
 
-    let distance = dist(point.x, point.y, closestX, closestY)
+    let distance = this.s.dist(point.x, point.y, closestX, closestY)
 
     return distance < radius
   }
@@ -166,11 +170,12 @@ function clamp(value, min, max) {
 }
 
 class LinearVehicleCollection {
-  constructor(w, h) {
+  constructor(w, h, sketch) {
+    this.s = sketch
     this.canvasWidth = w
     this.canvasHeight = h
     this.idIterator = 0
-    this.treeBoundary = new Rectangle(0 - w, 0 - h, w * 2, h * 2)
+    this.treeBoundary = new Rectangle(0 - w, 0 - h, w * 2, h * 2, this.s)
     // this.tree = new VehicleQuadTree(this.treeBoundary,5)
     this.vehicles = []
     this.neighborQueryDistance = 50
@@ -211,25 +216,25 @@ class LinearVehicleCollection {
   }
 
   findNoiseVector(vehicle) {
-    let noiseVal = noise(
+    let noiseVal = this.s.noise(
       vehicle.location.x * this.patternScale + this.noiseTime,
       vehicle.location.y * this.patternScale + this.noiseTime,
     )
-    let radianVal = map(noiseVal, 0, 1, 0, Math.PI * 2)
+    let radianVal = this.s.map(noiseVal, 0, 1, 0, Math.PI * 2)
     let noiseX =
       Math.cos(radianVal) *
-      randomGaussian(this.outputScale, this.outputScale / 2)
+      this.s.randomGaussian(this.outputScale, this.outputScale / 2)
     let noiseY =
       Math.sin(radianVal) *
-      randomGaussian(this.outputScale, this.outputScale / 2)
-    let noiseVect = createVector(noiseX, noiseY)
+      this.s.randomGaussian(this.outputScale, this.outputScale / 2)
+    let noiseVect = this.s.createVector(noiseX, noiseY)
     return noiseVect
   }
 
   findForwardVehicles(vehicle) {}
 
   findNearbyVehicles() {
-    let tree = new VehicleQuadTree(this.treeBoundary, 5)
+    let tree = new VehicleQuadTree(this.treeBoundary, 5, this.s)
     for (let vehicle of this.vehicles) {
       tree.insert(vehicle)
     }
@@ -237,7 +242,7 @@ class LinearVehicleCollection {
       let nearbyVehicles = tree.queryRange(vehicle, this.neighborQueryDistance)
       // this.findNearbyVehicles(vehicle,searchDistance)
       for (let nearbyVehicle of nearbyVehicles) {
-        line(
+        this.s.line(
           vehicle.location.x,
           vehicle.location.y,
           nearbyVehicle.location.x,
@@ -251,12 +256,13 @@ class LinearVehicleCollection {
 class LinearVehicle {
   constructor(locationVector, guideVector, linearVehicleCollection) {
     this.id = undefined
+    this.s = linearVehicleCollection.s
     this.lifeExpectancy = 50
     this.randomDieRate = 0.02
     this.age = 0
     this.location = locationVector
     this.guide = guideVector
-    this.direction = createVector(this.guide.x, this.guide.y).normalize()
+    this.direction = this.s.createVector(this.guide.x, this.guide.y).normalize()
     this.velocity = this.guide.mag() / 20
 
     this.movementType = 'no neighbors'
@@ -267,7 +273,7 @@ class LinearVehicle {
   dies() {
     if (this.lifeExpectancy < this.age) {
       return true
-    } else if (random() < this.randomDieRate) {
+    } else if (this.s.random() < this.randomDieRate) {
       return true
     }
     return false
@@ -279,11 +285,11 @@ class LinearVehicle {
   }
 
   move() {
-    this.movement = createVector(this.direction.x, this.direction.y).setMag(
-      this.velocity,
-    )
+    this.movement = this.s
+      .createVector(this.direction.x, this.direction.y)
+      .setMag(this.velocity)
     this.noisyMovement = this.swarm.findNoiseVector(this)
-    this.movement = p5.Vector.add(this.movement, this.noisyMovement)
+    this.movement = P5.Vector.add(this.movement, this.noisyMovement)
     this.velosity = this.movement.mag()
     this.location.x += this.movement.x
     this.location.y += this.movement.y
@@ -295,8 +301,8 @@ class LinearVehicle {
   }
 
   draw() {
-    fill(0)
-    circle(this.location.x, this.location.y, 2)
+    this.s.fill(0)
+    this.s.circle(this.location.x, this.location.y, 2)
     console.log('drawing vehicle')
   }
 }

@@ -1,7 +1,7 @@
 <script setup>
 import P5 from 'p5'
 import { useFlowFieldStore } from '@/store/flowFieldStore'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { storeToRefs } from 'pinia'
 import {
   PerlinPathCollection,
@@ -78,6 +78,12 @@ onMounted(() => {
   }
 
   new P5(sketch, 'canvas')
+})
+
+onBeforeUnmount(() => {
+  let elements = document.getElementsByClassName('p5Canvas')
+  console.log('p5 canvas elements', elements)
+  // elements.foreach((el) => el.remove())
 })
 </script>
 

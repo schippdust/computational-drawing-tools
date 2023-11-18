@@ -13,5 +13,7 @@
 			"path": "../Digital Dust"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Digital Dust Interface"
+	}
 }

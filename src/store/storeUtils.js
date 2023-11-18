@@ -1,3 +1,5 @@
+import { saveAs } from 'file-saver'
+
 //create full hex from a short format hex
 function fullHexFromShort(hex) {
   let r = hex.slice(1, 2)
@@ -37,4 +39,22 @@ function getNowAsString() {
   return time
 }
 
-export { fullHexFromShort, hexToRgb, getNowAsString }
+function saveP5CanvasAsImage(drawingName) {
+  console.log('saving image')
+  let classQueryResults = document.getElementsByClassName('p5Canvas')
+  if (classQueryResults.length > 1) {
+    console.log(
+      'multiple matching classes were found, saving only the first one',
+    )
+  } else if (classQueryResults.length <= 0) {
+    console.log("no matching classes were found, something isn't right")
+    return
+  }
+  let canvas = classQueryResults[0]
+  console.log('canvas element identified', canvas)
+  canvas.toBlob(function (blob) {
+    saveAs(blob, getNowAsString() + ' - ' + drawingName + '.png')
+  })
+}
+
+export { fullHexFromShort, hexToRgb, getNowAsString, saveP5CanvasAsImage }

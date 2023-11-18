@@ -5,8 +5,7 @@ import { useFlowFieldStore } from '@/store/flowFieldStore'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import router from '@/router'
-import { saveAs } from 'file-saver'
-import { getNowAsString } from '@/store/storeUtils'
+import { saveP5CanvasAsImage } from '@/store/storeUtils'
 
 const flowFieldStore = useFlowFieldStore()
 const {
@@ -40,24 +39,6 @@ function setNewRandomTime() {
   console.log('set new random time')
   flowFieldStore.setNewRandomTime()
 }
-
-function saveImage() {
-  console.log('saving image')
-  let classQueryResults = document.getElementsByClassName('p5Canvas')
-  if (classQueryResults.length > 1) {
-    console.log(
-      'multiple matching classes were found, saving only the first one',
-    )
-  } else if (classQueryResults.length <= 0) {
-    console.log("no matching classes were found, something isn't right")
-    return
-  }
-  let canvas = classQueryResults[0]
-  console.log('canvas element identified', canvas)
-  canvas.toBlob(function (blob) {
-    saveAs(blob, getNowAsString() + ' - flow field.png')
-  })
-}
 </script>
 
 <template>
@@ -70,7 +51,7 @@ function saveImage() {
           color="blue"
           dark
           title="Save Image"
-          @click="saveImage"
+          @click="saveP5CanvasAsImage('flow field')"
         >
           <v-icon class="ma-0">mdi-floppy</v-icon>
         </v-btn>
