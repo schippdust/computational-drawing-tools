@@ -15,11 +15,6 @@ const {
   noiseScale,
   noiseStrength,
 } = storeToRefs(connectionsStore)
-
-function setNewRandomTime() {
-  console.log('set new random time')
-  connectionsStore.setNewRandomTime()
-}
 </script>
 
 <template>
@@ -80,7 +75,7 @@ function setNewRandomTime() {
             <v-slider
               label="Point Spacing"
               :min="5"
-              :max="40"
+              :max="100"
               step="5"
               :model-value="pointSpacing"
               thumb-label="always"
@@ -97,7 +92,6 @@ function setNewRandomTime() {
               @end="connectionsStore.setVehicleDieOffRate($event)"
             ></v-slider>
           </v-card>
-
         </v-menu>
       </v-col>
 
@@ -126,7 +120,6 @@ function setNewRandomTime() {
               @end="connectionsStore.setConnectionSearchDistance($event)"
             ></v-slider>
           </v-card>
-
         </v-menu>
       </v-col>
 
@@ -169,13 +162,12 @@ function setNewRandomTime() {
               color="black"
               dark
               title="Randomize Noise"
-              @click="setNewRandomTime()"
+              @click="connectionsStore.setNewRandomTime()"
             >
               <!-- <v-icon class="ma-0">mdi-dice-3-outline</v-icon> -->
               Random Noise Time
             </v-btn>
           </v-card>
-          
         </v-menu>
       </v-col>
 

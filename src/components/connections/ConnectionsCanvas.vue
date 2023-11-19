@@ -6,10 +6,32 @@ import { storeToRefs } from 'pinia'
 import { LinearVehicleCollection } from './ConnectionsClasses'
 
 const connectionsStore = useConnectionsStore()
-const { canvasWidth, canvasHeight, noiseTime, playing } =
-  storeToRefs(connectionsStore)
+const {
+  canvasWidth,
+  canvasHeight,
+  noiseTime,
+  connectionSearchDistance,
+  numberOfPoints,
+  pointSpacing,
+  vehicleDieOffRate,
+  noiseScale,
+  noiseStrength,
+  playing,
+} = storeToRefs(connectionsStore)
 let pressed = false
 onMounted(() => {
+  function getSketchParams() {
+    return {
+      connectionSearchDistance: connectionSearchDistance.value,
+      noiseTime: noiseTime.value,
+      noiseScale: noiseScale.value,
+      noiseStrength: noiseStrength.value,
+      vehicleDieOffRate: vehicleDieOffRate.value,
+      pointSpacing: pointSpacing.value,
+      numberOfPoints: numberOfPoints.value,
+    }
+  }
+
   const sketch = (s) => {
     s.linearVehicles = undefined
     s.startPpoint = undefined
@@ -20,10 +42,11 @@ onMounted(() => {
       s.background(255)
       // s.noLoop()
       s.frameRate(30)
+
       s.linearVehicles = new LinearVehicleCollection(
         canvasWidth.value,
         canvasHeight.value,
-        noiseTime.value,
+        getSketchParams(),
         s,
       )
       console.log('setup run', s)
@@ -31,7 +54,7 @@ onMounted(() => {
 
     s.draw = () => {
       if (playing.value) {
-        s.linearVehicles.update(noiseTime.value)
+        s.linearVehicles.update(getSketchParams())
       }
     }
 
@@ -45,18 +68,19 @@ onMounted(() => {
     s.mouseReleased = () => {
       if (playing.value && pressed) {
         s.endPoint = s.createVector(s.mouseX, s.mouseY)
-        s.stroke(50)
-        let guideVector = P5.Vector.sub(s.endPoint, s.startPoint)
-        let perpVector = s
-          .createVector(guideVector.x, guideVector.y)
-          .normalize()
-          .rotate(s.HALF_PI)
-        for (let i = -3; i < 4; i++) {
-          let distMultiplier = 49 * i
-          let moveVector = P5.Vector.mult(perpVector, distMultiplier)
-          let adjustedStart = P5.Vector.add(s.startPoint, moveVector)
-          s.linearVehicles.addLinearVehicle(adjustedStart, guideVector)
-        }
+        s.linearVehicles.addRowOfVehicles(s.startPoint, s.endPoint)
+        // s.stroke(50)
+        // let guideVector = P5.Vector.sub(s.endPoint, s.startPoint)
+        // let perpVector = s
+        //   .createVector(guideVector.x, guideVector.y)
+        //   .normalize()
+        //   .rotate(s.HALF_PI)
+        // for (let i = -3; i < 4; i++) {
+        //   let distMultiplier = 49 * i
+        //   let moveVector = P5.Vector.mult(perpVector, distMultiplier)
+        //   let adjustedStart = P5.Vector.add(s.startPoint, moveVector)
+        //   s.linearVehicles.addLinearVehicle(adjustedStart, guideVector)
+        // }
         pressed = false
       }
     }

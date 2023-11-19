@@ -5,8 +5,9 @@ export const useConnectionsStore = defineStore('connectionStore', {
     canvasHeight: 2400,
     noiseTime: parseInt(Math.random() * 100000),
     playing: true,
+    drawCircles: true,
     numberOfPoints: 5,
-    pointSpacing: 10,
+    pointSpacing: 50,
     vehicleDieOffRate: 0.02,
     connectionSearchDistance: 50,
     noiseScale: 0.001,
@@ -36,6 +37,9 @@ export const useConnectionsStore = defineStore('connectionStore', {
     },
     setNoiseStrength(noiseStrength) {
       this.noiseStrength = Number(noiseStrength)
+    },
+    toggleDrawCircles() {
+      this.drawCircles = !this.drawCircles
     },
   },
 })

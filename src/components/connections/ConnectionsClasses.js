@@ -170,18 +170,22 @@ function clamp(value, min, max) {
 }
 
 class LinearVehicleCollection {
-  constructor(w, h, noiseTime, sketch) {
+  constructor(w, h, params, sketch) {
     this.s = sketch
+    this.params = params
     this.canvasWidth = w
     this.canvasHeight = h
     this.idIterator = 0
     this.treeBoundary = new Rectangle(0 - w, 0 - h, w * 2, h * 2, this.s)
     // this.tree = new VehicleQuadTree(this.treeBoundary,5)
     this.vehicles = []
-    this.connectionSearchDistance = 50
-    this.noiseTime = noiseTime
-    this.noiseScale = 0.001
-    this.noiseStrength = 10
+    this.connectionSearchDistance = params.connectionSearchDistance
+    this.noiseTime = params.noiseTime
+    this.noiseScale = params.noiseScale
+    this.noiseStrength = params.noiseStrength
+    this.vehicleDieOffRate = params.vehicleDieOffRate
+    this.pointSpacing = params.pointSpacing
+    this.numberOfPoints = params.numberOfPoints
   }
 
   addLinearVehicle(locationVector, guideVector) {
@@ -191,6 +195,22 @@ class LinearVehicleCollection {
     this.idIterator += 1
     // this.tree.insert(newVehicle)
     this.vehicles.push(newVehicle)
+  }
+
+  addRowOfVehicles(startPoint, endPoint) {
+    this.s.stroke(50)
+    let guideVector = P5.Vector.sub(endPoint, startPoint)
+    let perpVector = this.s
+      .createVector(guideVector.x, guideVector.y)
+      .normalize()
+      .rotate(this.s.HALF_PI)
+    let halfDistance = (this.pointSpacing * (this.numberOfPoints - 1)) / 2
+    for (let i = 0; i < this.numberOfPoints; i++) {
+      let distMultiplier = -1 * halfDistance + i * this.pointSpacing
+      let moveVector = P5.Vector.mult(perpVector, distMultiplier)
+      let adjustedStart = P5.Vector.add(startPoint, moveVector)
+      this.addLinearVehicle(adjustedStart, guideVector)
+    }
   }
 
   deleteOldVehicles() {
@@ -207,8 +227,15 @@ class LinearVehicleCollection {
     }
   }
 
-  update(noiseTime) {
-    this.noiseTime = noiseTime
+  update(params) {
+    this.params = params
+    this.connectionSearchDistance = params.connectionSearchDistance
+    this.noiseTime = params.noiseTime
+    this.noiseScale = params.noiseScale
+    this.noiseStrength = params.noiseStrength
+    this.vehicleDieOffRate = params.vehicleDieOffRate
+    this.pointSpacing = params.pointSpacing
+    this.numberOfPoints = params.numberOfPoints
     // console.log('updating')
     // console.log(this.vehicles)
     this.deleteOldVehicles()
@@ -261,8 +288,9 @@ class LinearVehicle {
   constructor(locationVector, guideVector, linearVehicleCollection) {
     this.id = undefined
     this.s = linearVehicleCollection.s
+    this.params = linearVehicleCollection.params
     this.lifeExpectancy = 50
-    this.randomDieRate = 0.02
+    this.randomDieRate = this.params.vehicleDieOffRate
     this.age = 0
     this.location = locationVector
     this.guide = guideVector
