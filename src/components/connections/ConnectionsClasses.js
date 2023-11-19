@@ -118,7 +118,7 @@ class VehicleQuadTree {
     // Check if the vehicle exists in this node and remove it
     let index = this.vehicles.indexOf(vehicle)
     if (index !== -1) {
-      console.log('deleting vehicle')
+      // console.log('deleting vehicle')
       this.vehicles.filter((v) => v != vehicle)
       // this.vehicles.splice(index, 1);
       return true
@@ -170,7 +170,7 @@ function clamp(value, min, max) {
 }
 
 class LinearVehicleCollection {
-  constructor(w, h, sketch) {
+  constructor(w, h, noiseTime, sketch) {
     this.s = sketch
     this.canvasWidth = w
     this.canvasHeight = h
@@ -178,10 +178,10 @@ class LinearVehicleCollection {
     this.treeBoundary = new Rectangle(0 - w, 0 - h, w * 2, h * 2, this.s)
     // this.tree = new VehicleQuadTree(this.treeBoundary,5)
     this.vehicles = []
-    this.neighborQueryDistance = 50
-    this.noiseTime = 400
-    this.patternScale = 0.001
-    this.outputScale = 10
+    this.connectionSearchDistance = 50
+    this.noiseTime = noiseTime
+    this.noiseScale = 0.001
+    this.noiseStrength = 10
   }
 
   addLinearVehicle(locationVector, guideVector) {
@@ -207,9 +207,10 @@ class LinearVehicleCollection {
     }
   }
 
-  update() {
+  update(noiseTime) {
+    this.noiseTime = noiseTime
     // console.log('updating')
-    console.log(this.vehicles)
+    // console.log(this.vehicles)
     this.deleteOldVehicles()
     this.updateVehicles()
     this.findNearbyVehicles()
@@ -217,16 +218,16 @@ class LinearVehicleCollection {
 
   findNoiseVector(vehicle) {
     let noiseVal = this.s.noise(
-      vehicle.location.x * this.patternScale + this.noiseTime,
-      vehicle.location.y * this.patternScale + this.noiseTime,
+      (vehicle.location.x + this.noiseTime) * this.noiseScale,
+      (vehicle.location.y + this.noiseTime) * this.noiseScale,
     )
-    let radianVal = this.s.map(noiseVal, 0, 1, 0, Math.PI * 2)
+    let radianVal = this.s.map(noiseVal, 0, 1, -Math.PI * 2, Math.PI * 4)
     let noiseX =
       Math.cos(radianVal) *
-      this.s.randomGaussian(this.outputScale, this.outputScale / 2)
+      this.s.randomGaussian(this.noiseStrength, this.noiseStrength / 2)
     let noiseY =
       Math.sin(radianVal) *
-      this.s.randomGaussian(this.outputScale, this.outputScale / 2)
+      this.s.randomGaussian(this.noiseStrength, this.noiseStrength / 2)
     let noiseVect = this.s.createVector(noiseX, noiseY)
     return noiseVect
   }
@@ -239,7 +240,10 @@ class LinearVehicleCollection {
       tree.insert(vehicle)
     }
     for (let vehicle of this.vehicles) {
-      let nearbyVehicles = tree.queryRange(vehicle, this.neighborQueryDistance)
+      let nearbyVehicles = tree.queryRange(
+        vehicle,
+        this.connectionSearchDistance,
+      )
       // this.findNearbyVehicles(vehicle,searchDistance)
       for (let nearbyVehicle of nearbyVehicles) {
         this.s.line(
@@ -266,7 +270,7 @@ class LinearVehicle {
     this.velocity = this.guide.mag() / 20
 
     this.movementType = 'no neighbors'
-    console.log('instantiating vehicle')
+    // console.log('instantiating vehicle')
     this.swarm = linearVehicleCollection
   }
 
@@ -303,7 +307,7 @@ class LinearVehicle {
   draw() {
     this.s.fill(0)
     this.s.circle(this.location.x, this.location.y, 2)
-    console.log('drawing vehicle')
+    // console.log('drawing vehicle')
   }
 }
 
