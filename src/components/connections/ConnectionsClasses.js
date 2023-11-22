@@ -1,4 +1,6 @@
 import P5 from 'p5'
+import { useConnectionsStore } from '@/store/connectionsStore'
+const connectionsStore = useConnectionsStore()
 
 class VehicleQuadTree {
   constructor(boundary, capacity, sketch) {
@@ -173,19 +175,25 @@ class LinearVehicleCollection {
   constructor(w, h, params, sketch) {
     this.s = sketch
     this.params = params
+    this.readParams()
     this.canvasWidth = w
     this.canvasHeight = h
     this.idIterator = 0
     this.treeBoundary = new Rectangle(0 - w, 0 - h, w * 2, h * 2, this.s)
     // this.tree = new VehicleQuadTree(this.treeBoundary,5)
     this.vehicles = []
-    this.connectionSearchDistance = params.connectionSearchDistance
-    this.noiseTime = params.noiseTime
-    this.noiseScale = params.noiseScale
-    this.noiseStrength = params.noiseStrength
-    this.vehicleDieOffRate = params.vehicleDieOffRate
-    this.pointSpacing = params.pointSpacing
-    this.numberOfPoints = params.numberOfPoints
+    this.readParams()
+  }
+  
+  readParams(){
+    this.connectionSearchDistance = this.params.connectionSearchDistance
+    this.noiseTime = this.params.noiseTime
+    this.noiseScale = this.params.noiseScale
+    this.noiseStrength = this.params.noiseStrength
+    this.vehicleDieOffRate = this.params.vehicleDieOffRate
+    this.pointSpacing = this.params.pointSpacing
+    this.numberOfPoints = this.params.numberOfPoints
+    this.drawPoints = this.params.drawPoints
   }
 
   addLinearVehicle(locationVector, guideVector) {
@@ -223,19 +231,13 @@ class LinearVehicleCollection {
 
   updateVehicles() {
     for (let vehicle of this.vehicles) {
-      vehicle.update()
+      vehicle.update(this.params)
     }
   }
 
   update(params) {
     this.params = params
-    this.connectionSearchDistance = params.connectionSearchDistance
-    this.noiseTime = params.noiseTime
-    this.noiseScale = params.noiseScale
-    this.noiseStrength = params.noiseStrength
-    this.vehicleDieOffRate = params.vehicleDieOffRate
-    this.pointSpacing = params.pointSpacing
-    this.numberOfPoints = params.numberOfPoints
+    this.readParams()
     // console.log('updating')
     // console.log(this.vehicles)
     this.deleteOldVehicles()
@@ -279,6 +281,10 @@ class LinearVehicleCollection {
           nearbyVehicle.location.x,
           nearbyVehicle.location.y,
         )
+        connectionsStore.addLineToDrawRecord(vehicle.location.x,
+          vehicle.location.y,
+          nearbyVehicle.location.x,
+          nearbyVehicle.location.y)
       }
     }
   }
@@ -311,7 +317,8 @@ class LinearVehicle {
     return false
   }
 
-  update() {
+  update(params) {
+    this.params = params
     this.move()
     this.draw()
   }
@@ -333,9 +340,11 @@ class LinearVehicle {
   }
 
   draw() {
-    this.s.fill(0)
-    this.s.circle(this.location.x, this.location.y, 2)
-    // console.log('drawing vehicle')
+    if (this.params.drawPoints){
+      this.s.fill(0)
+      this.s.circle(this.location.x, this.location.y, 2)
+      connectionsStore.addPointToDrawRecord(this.location.x,this.location.y)
+    }
   }
 }
 

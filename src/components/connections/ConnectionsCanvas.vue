@@ -17,8 +17,11 @@ const {
   noiseScale,
   noiseStrength,
   playing,
+  drawPoints
 } = storeToRefs(connectionsStore)
+
 let pressed = false
+
 onMounted(() => {
   function getSketchParams() {
     return {
@@ -29,6 +32,7 @@ onMounted(() => {
       vehicleDieOffRate: vehicleDieOffRate.value,
       pointSpacing: pointSpacing.value,
       numberOfPoints: numberOfPoints.value,
+      drawPoints: drawPoints.value
     }
   }
 

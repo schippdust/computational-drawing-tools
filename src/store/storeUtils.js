@@ -57,4 +57,14 @@ function saveP5CanvasAsImage(drawingName) {
   })
 }
 
-export { fullHexFromShort, hexToRgb, getNowAsString, saveP5CanvasAsImage }
+function saveCsvData(drawingName, csvDataAsString){
+  let file = new File([csvDataAsString], "test.csv", { type: "text/csv;charset=utf-8" })
+  saveAs(file, getNowAsString() + ' - ' + drawingName + '.csv')
+}
+
+function saveImageAndCsv(drawingName,csvDataAsString) {
+  saveP5CanvasAsImage(drawingName)
+  saveCsvData(drawingName, csvDataAsString)
+}
+
+export { saveImageAndCsv, fullHexFromShort, hexToRgb, getNowAsString, saveP5CanvasAsImage }

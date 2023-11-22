@@ -2,7 +2,7 @@
 import ConnectionsCanvas from '@/components/connections/ConnectionsCanvas'
 import router from '@/router'
 import { useConnectionsStore } from '@/store/connectionsStore'
-import { saveP5CanvasAsImage } from '@/store/storeUtils'
+import { saveImageAndCsv } from '@/store/storeUtils'
 import { storeToRefs } from 'pinia'
 
 const connectionsStore = useConnectionsStore()
@@ -14,7 +14,11 @@ const {
   connectionSearchDistance,
   noiseScale,
   noiseStrength,
+  drawPoints,
+  drawRecord
 } = storeToRefs(connectionsStore)
+
+
 </script>
 
 <template>
@@ -27,7 +31,7 @@ const {
           color="blue"
           dark
           title="Save Image"
-          @click="saveP5CanvasAsImage('connections')"
+          @click="saveImageAndCsv('connections',drawRecord)"
         >
           <v-icon class="ma-0">mdi-floppy</v-icon>
         </v-btn>
@@ -91,6 +95,15 @@ const {
               thumb-label="always"
               @end="connectionsStore.setVehicleDieOffRate($event)"
             ></v-slider>
+
+            <v-switch
+            label="Draw Points"
+            color="green"
+            :model-value="drawPoints"
+            @update:model-value="connectionsStore.toggleDrawPoints()"
+            >
+
+            </v-switch>
           </v-card>
         </v-menu>
       </v-col>
@@ -142,6 +155,7 @@ const {
               label="Noise Scale"
               :min="0.001"
               :max="0.1"
+              step="0.001"
               :model-value="noiseScale"
               thumb-label="always"
               @end="connectionsStore.setNoiseScale($event)"
