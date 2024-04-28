@@ -13,7 +13,7 @@ export const useConnectionsStore = defineStore('connectionStore', {
     noiseScale: 0.001,
     noiseStrength: 10,
     drawPoints: true,
-    drawRecord: "geometry type,x1,y1,x2,y2\r\n"
+    drawRecord: 'geometry type,x1,y1,x2,y2\r\n',
   }),
   actions: {
     setNewRandomTime() {
@@ -43,11 +43,11 @@ export const useConnectionsStore = defineStore('connectionStore', {
     toggleDrawPoints() {
       this.drawPoints = !this.drawPoints
     },
-    addPointToDrawRecord(x,y){
+    addPointToDrawRecord(x, y) {
       let pointDefinition = `point,${x},${y},,\r\n`
       this.drawRecord = this.drawRecord + pointDefinition
     },
-    addLineToDrawRecord(x1,y1,x2,y2){
+    addLineToDrawRecord(x1, y1, x2, y2) {
       let lineDefinition = `line,${x1},${y1},${x2},${y2}\r\n`
       this.drawRecord = this.drawRecord + lineDefinition
     },

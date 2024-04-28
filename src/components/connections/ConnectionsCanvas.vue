@@ -17,7 +17,7 @@ const {
   noiseScale,
   noiseStrength,
   playing,
-  drawPoints
+  drawPoints,
 } = storeToRefs(connectionsStore)
 
 let pressed = false
@@ -32,7 +32,7 @@ onMounted(() => {
       vehicleDieOffRate: vehicleDieOffRate.value,
       pointSpacing: pointSpacing.value,
       numberOfPoints: numberOfPoints.value,
-      drawPoints: drawPoints.value
+      drawPoints: drawPoints.value,
     }
   }
 

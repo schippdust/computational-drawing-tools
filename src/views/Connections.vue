@@ -15,10 +15,8 @@ const {
   noiseScale,
   noiseStrength,
   drawPoints,
-  drawRecord
+  drawRecord,
 } = storeToRefs(connectionsStore)
-
-
 </script>
 
 <template>
@@ -31,7 +29,7 @@ const {
           color="blue"
           dark
           title="Save Image"
-          @click="saveImageAndCsv('connections',drawRecord)"
+          @click="saveImageAndCsv('connections', drawRecord)"
         >
           <v-icon class="ma-0">mdi-floppy</v-icon>
         </v-btn>
@@ -97,12 +95,11 @@ const {
             ></v-slider>
 
             <v-switch
-            label="Draw Points"
-            color="green"
-            :model-value="drawPoints"
-            @update:model-value="connectionsStore.toggleDrawPoints()"
+              label="Draw Points"
+              color="green"
+              :model-value="drawPoints"
+              @update:model-value="connectionsStore.toggleDrawPoints()"
             >
-
             </v-switch>
           </v-card>
         </v-menu>

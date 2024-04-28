@@ -184,8 +184,8 @@ class LinearVehicleCollection {
     this.vehicles = []
     this.readParams()
   }
-  
-  readParams(){
+
+  readParams() {
     this.connectionSearchDistance = this.params.connectionSearchDistance
     this.noiseTime = this.params.noiseTime
     this.noiseScale = this.params.noiseScale
@@ -281,10 +281,12 @@ class LinearVehicleCollection {
           nearbyVehicle.location.x,
           nearbyVehicle.location.y,
         )
-        connectionsStore.addLineToDrawRecord(vehicle.location.x,
+        connectionsStore.addLineToDrawRecord(
+          vehicle.location.x,
           vehicle.location.y,
           nearbyVehicle.location.x,
-          nearbyVehicle.location.y)
+          nearbyVehicle.location.y,
+        )
       }
     }
   }
@@ -340,10 +342,10 @@ class LinearVehicle {
   }
 
   draw() {
-    if (this.params.drawPoints){
+    if (this.params.drawPoints) {
       this.s.fill(0)
       this.s.circle(this.location.x, this.location.y, 2)
-      connectionsStore.addPointToDrawRecord(this.location.x,this.location.y)
+      connectionsStore.addPointToDrawRecord(this.location.x, this.location.y)
     }
   }
 }
