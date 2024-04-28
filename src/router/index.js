@@ -21,6 +21,11 @@ const routes = [
         name: 'Connections',
         component: () => import('@/views/Connections.vue'),
       },
+      {
+        path: 'vehicle-tests',
+        name: 'Vehicle Tests',
+        component: () => import('@/views/VehicleTests.vue'),
+      },
     ],
   },
 ]
