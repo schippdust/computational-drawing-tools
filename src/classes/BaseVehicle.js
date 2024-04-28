@@ -9,14 +9,27 @@ export class BaseVehicle {
     this.position = this.s.createVector(x, y)
     this.velocity = this.s.createVector(0, 0)
     this.acceleration = this.s.createVector(0, 0)
-    this.frictionalLoss = 0.1
+    this.mass = 10
+    this.coefOfFrict = 0.7
     this.maxVelocity = 2
+    // this.maxAcceleration = 1 // not currently in use, consider implementing later if required
+  }
+
+  update(){
+    this.velocity.add(this.acceleration)
+    this.location.add(this.velocity)
+    this.acceleration.mult(this.accelerationDecay)
   }
 
   applyForce(force = this.s.createVector(0, 0)) {
-    this.acceleration = this.acceleration.add(force)
+    let acceleration = P5.Vector.div(force,this.mass)
+    this.acceleration.add(acceleration)
   }
 
+  // Logic to select behavior may be appropriate in this class, or may be more appropriate in extensions of this class
+  // based on the application desired in its implementations
+  // DECIDE LATER
+  
   //Vehicles Logic
   // selectAction(action,steering=this.s.createVector(0,0)){
   //     if (action == VehicleActions.STEER){
@@ -49,5 +62,15 @@ export class BaseVehicle {
   }
   get yAcc() {
     return this.acceleration.y
+  }
+  get telemetry() {
+    return {
+      x: this.x,
+      y: this.y,
+      xVel: this.xVel,
+      yVel: this.yVel,
+      xAcc: this.xAcc,
+      yAcc: this.yAcc
+    }
   }
 }
