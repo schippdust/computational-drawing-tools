@@ -11,7 +11,7 @@ export class BaseVehicle {
     this.acceleration = this.s.createVector(0, 0)
     this.mass = 10
     this.coefOfFrict = 0.7
-    this.maxVelocity = 2
+    this.maxVelocity = 10
     // this.maxAcceleration = 1 // not currently in use, consider implementing later if required
   }
 
@@ -21,6 +21,7 @@ export class BaseVehicle {
   }
 
   applyFriction(){
+    // this is a simplified solution that roughly models real world behavior and assumes the canvas is "flat"
     let friction = P5.Vector.copy(this.velocity)
     friction.mult(-1)
     friction.normalize()
