@@ -18,7 +18,13 @@ export class BaseVehicle {
   update(){
     this.velocity.add(this.acceleration)
     this.location.add(this.velocity)
-    this.acceleration.mult(this.accelerationDecay)
+  }
+
+  applyFriction(){
+    let friction = P5.Vector.copy(this.velocity)
+    friction.mult(-1)
+    friction.normalize()
+    friction.mult(this.coefOfFrict)
   }
 
   applyForce(force = this.s.createVector(0, 0)) {
@@ -29,7 +35,7 @@ export class BaseVehicle {
   // Logic to select behavior may be appropriate in this class, or may be more appropriate in extensions of this class
   // based on the application desired in its implementations
   // DECIDE LATER
-  
+
   //Vehicles Logic
   // selectAction(action,steering=this.s.createVector(0,0)){
   //     if (action == VehicleActions.STEER){
