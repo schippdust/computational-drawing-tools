@@ -10,7 +10,6 @@ export class BaseVehicle {
     this.s = sketch
     this.position = this.s.createVector(x, y)
     this.previousPositions = new LimitedArray(20)
-    this.previousPositions.push(this.position.copy())
 
     this.velocity = this.s.createVector(0, 0)
     this.coefOfFrict = 0.7
@@ -34,16 +33,17 @@ export class BaseVehicle {
     }
     this.velocity.add(this.acceleration).limit(this.maxVelocity)
     this.position.add(this.velocity)
-    if (this.velocity.mag() < 0.00001){
+    if (this.velocity.mag() < 0.00001) {
       this.velocity.mult(0)
     }
     this.acceleration.mult(0)
+    this.previousPositions.push(this.position.copy())
   }
 
   applyForce(force = this.s.createVector(0, 0)) {
     let acceleration = P5.Vector.div(force, this.mass)
     this.acceleration.add(acceleration)
-    if (this.acceleration.mag() < 0.00001){
+    if (this.acceleration.mag() < 0.00001) {
       this.acceleration.mult(0)
     }
   }
@@ -104,31 +104,31 @@ export class BaseVehicle {
     let belowBounds = false
     let leftOfBounds = false
     let rightOfBounds = false
-    if (this.position.x < min.x){
+    if (this.position.x < min.x) {
       leftOfBounds = true
-    } else if (this.position.x > max.x){
+    } else if (this.position.x > max.x) {
       rightOfBounds = true
     }
-    if (this.position.y < min.y){
+    if (this.position.y < min.y) {
       aboveBounds = true //above and below are relative to +y axis pointing downward
-    } else if (this.position.y > max.y){
+    } else if (this.position.y > max.y) {
       belowBounds = true
     }
-    if (!aboveBounds && !belowBounds && !leftOfBounds && !rightOfBounds){
+    if (!aboveBounds && !belowBounds && !leftOfBounds && !rightOfBounds) {
       return
     }
     let steer = this.velocity.copy()
-    if (aboveBounds){
+    if (aboveBounds) {
       steer.y = min.y - this.position.y
-    } else if (belowBounds){
+    } else if (belowBounds) {
       steer.y = max.y - this.position.y
     }
-    if (rightOfBounds){
+    if (rightOfBounds) {
       steer.x = max.x - this.position.x
-    } else if (leftOfBounds){
+    } else if (leftOfBounds) {
       steer.x = min.x - this.position.x
     }
-    let target = P5.Vector.add(this.position,steer)
+    let target = P5.Vector.add(this.position, steer)
     // this.applyForce(steer)
     this.seak(target)
   }

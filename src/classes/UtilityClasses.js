@@ -1,21 +1,21 @@
 export class LimitedArray {
   constructor(maxLength = 20) {
     this.maxLength = maxLength
-    this.array = []
+    this.items = []
   }
 
   push(item) {
-    if (this.array.length >= this.maxLength) {
-      this.array.shift()
+    if (this.items.length >= this.maxLength) {
+      this.items.shift()
     }
-    this.array.push(item)
+    this.items.push(item)
   }
 
   get length() {
-    return this.array.length
+    return this.items.length
   }
 
   toArray() {
-    return this.array.slice()
+    return this.items.slice()
   }
 }
