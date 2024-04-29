@@ -34,7 +34,18 @@ export class BaseVehicle {
     }
     this.velocity.add(this.acceleration).limit(this.maxVelocity)
     this.position.add(this.velocity)
+    if (this.velocity.mag() < 0.00001){
+      this.velocity.mult(0)
+    }
     this.acceleration.mult(0)
+  }
+
+  applyForce(force = this.s.createVector(0, 0)) {
+    let acceleration = P5.Vector.div(force, this.mass)
+    this.acceleration.add(acceleration)
+    if (this.acceleration.mag() < 0.00001){
+      this.acceleration.mult(0)
+    }
   }
 
   applyFriction() {
@@ -42,11 +53,6 @@ export class BaseVehicle {
     let friction = P5.Vector.copy(this.velocity)
     friction.mult(-1).normalize().mult(this.coefOfFrict)
     this.applyForce(friction)
-  }
-
-  applyForce(force = this.s.createVector(0, 0)) {
-    let acceleration = P5.Vector.div(force, this.mass)
-    this.acceleration.add(acceleration)
   }
 
   // Logic to select behavior may be appropriate in this class, or may be more appropriate in extensions of this class
@@ -88,6 +94,43 @@ export class BaseVehicle {
       this.maxWanderAdjustment * -1,
       this.maxWanderAdjustment,
     )
+  }
+
+  steerWithinBounds(
+    min = this.s.createVector(0, 0),
+    max = this.s.createVector(this.s.width, this.s.height),
+  ) {
+    let aboveBounds = false
+    let belowBounds = false
+    let leftOfBounds = false
+    let rightOfBounds = false
+    if (this.position.x < min.x){
+      leftOfBounds = true
+    } else if (this.position.x > max.x){
+      rightOfBounds = true
+    }
+    if (this.position.y < min.y){
+      aboveBounds = true //above and below are relative to +y axis pointing downward
+    } else if (this.position.y > max.y){
+      belowBounds = true
+    }
+    if (!aboveBounds && !belowBounds && !leftOfBounds && !rightOfBounds){
+      return
+    }
+    let steer = this.velocity.copy()
+    if (aboveBounds){
+      steer.y = min.y - this.position.y
+    } else if (belowBounds){
+      steer.y = max.y - this.position.y
+    }
+    if (rightOfBounds){
+      steer.x = max.x - this.position.x
+    } else if (leftOfBounds){
+      steer.x = min.x - this.position.x
+    }
+    let target = P5.Vector.add(this.position,steer)
+    // this.applyForce(steer)
+    this.seak(target)
   }
 
   randomizeLocation() {

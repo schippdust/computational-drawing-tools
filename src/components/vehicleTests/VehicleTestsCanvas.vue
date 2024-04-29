@@ -18,11 +18,11 @@ onMounted(() => {
       console.log('setup complete', s)
 
       movingTarget = new MovingTarget(s, 20)
-      movingTarget.wanderRadius = 50
-      movingTarget.coefOfFrict = 0.5
-      movingTarget.wanderForwardRatio = 0.2
-      movingTarget.mass = 15
-      movingTarget.maxWanderAdjustment = (2 * Math.PI) / 5
+      movingTarget.wanderRadius = 80
+      movingTarget.coefOfFrict = 0.3
+      movingTarget.wanderForwardRatio = .7
+      movingTarget.mass = 10
+      movingTarget.maxWanderAdjustment = (2 * Math.PI) / 20
       movingTarget.randomizeLocation()
       console.log('moving target', movingTarget)
     }
