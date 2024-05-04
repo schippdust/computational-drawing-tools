@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router'
-import { saveImageAndCsv } from './storeUtils'
+const router = useRouter()
+import { saveP5CanvasAsImage, saveCsvData } from './storeUtils'
 
-export const universalStore = defineStore('univeralStore', {
+export const useUniveralStore = defineStore('univeralStore', {
   state: () => ({
     saveToggle: false, //toggled to trigger watchers.  Not the most elegant but it works
     drawRecord: 'id,geometry type\r\n',
@@ -10,6 +11,10 @@ export const universalStore = defineStore('univeralStore', {
       ? JSON.parse(localStorage.getItem('print iterations'))
       : 0,
     maxIterations: 25,
+    automatedPrintingEnabled: false,
+    frameStepForPrinting: 250,
+    minFrameForPrinting: 850,
+    maxFrameToStopPrinting: 2600,
   }),
   actions: {
     resetPrintIteration() {
@@ -23,8 +28,43 @@ export const universalStore = defineStore('univeralStore', {
         this.drawRecord += vehicle.csvRecord
       }
     },
-    saveRecords(fileName) {
-      saveImageAndCsv(fileName, this.drawRecord)
+    saveDrawingRecord(fileName, savePng = true, saveCsv = true) {
+      if (savePng) {
+        saveP5CanvasAsImage(fileName)
+      }
+      if (saveCsv) {
+        saveCsvData(fileName, this.drawRecord)
+      }
+    },
+    automatedPrint(
+      frame,
+      vehicles,
+      fileName = 'sketch',
+      savePng = true,
+      saveCsv = true,
+    ) {
+      if (this.automatedPrint) {
+        if (
+          frame % this.frameStepForPrinting == 0 &&
+          frame >= this.minFrameForPrinting &&
+          frame < this.maxFrameToStopPrinting
+        ) {
+          this.resetDrawRecord()
+          for (let vehicle of vehicles) {
+            this.addVehicleToCsvRecord(vehilce)
+          }
+          this.saveDrawingRecord(fileName, savePng, saveCsv)
+        }
+        if (frame >= this.maxFrameToStopPrinting) {
+          this.printIteration += 1
+          if (this.printIteration < maxIterations) {
+            router.go()
+          } else {
+            console.log('navigating')
+            router.push({ name: 'Home' })
+          }
+        }
+      }
     },
   },
 })

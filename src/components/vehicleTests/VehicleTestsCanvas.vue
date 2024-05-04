@@ -1,20 +1,20 @@
 <script setup>
 import P5 from 'p5'
-import { useRouter } from 'vue-router'
-const router = useRouter()
-import { saveImageAndCsv } from '@/store/storeUtils'
+import { onMounted, onBeforeUnmount } from 'vue'
+import { storeToRefs } from 'pinia'
+
 import {
   MovingTarget,
   Tracer,
 } from '@/components/vehicleTests/VehicleTestsClasses.js'
-import { watch, onMounted } from 'vue'
+
+import { useUniveralStore } from '@/store/univeralStore'
+const universalStore = useUniveralStore()
 
 import { useVehicleTestStore } from '@/store/vehicleTestStore'
-import { storeToRefs } from 'pinia'
-import { onBeforeUnmount } from 'vue'
+
 const vehicleTestStore = useVehicleTestStore()
-const { saveToggle, drawRecord, playing, printIteration, maxIterations } =
-  storeToRefs(vehicleTestStore)
+const { playing } = storeToRefs(vehicleTestStore)
 
 const canvasWidth = 1500
 const canvasHeight = 1500
@@ -51,18 +51,10 @@ onMounted(() => {
     }
 
     s.draw = () => {
-      if (
-        (s.frameCount % 250 == 0 &&
-          s.frameCount > 850 &&
-          s.frameCount < 2600) ||
-        s.frameCount == 850
-      ) {
-        printCanvas()
-      }
       if (s.frameCount % 50 == 0) {
         console.log(s.frameCount)
       }
-      if (playing.value && s.frameCount < 2600) {
+      if (playing.value) {
         s.background(0)
         movingTarget.wander()
         movingTarget.draw()
@@ -70,31 +62,13 @@ onMounted(() => {
           tracer.seak(movingTarget.basePoint)
           tracer.draw()
         })
-      }
-      if (s.frameCount == 2600) {
-        printIteration.value += 1
-        if (printIteration.value < maxIterations.value) {
-          router.go()
-        } else {
-          console.log('navigating')
-          router.push({ name: 'Home' })
-        }
+
+        universalStore.automatedPrint(s.frameCount, tracers, 'tracers')
       }
     }
   }
 
   new P5(sketch, 'canvas')
-})
-function printCanvas() {
-  vehicleTestStore.resetDrawRecord()
-  for (let tracer of tracers) {
-    vehicleTestStore.addPolylineToDrawRecord(tracer.polylinePoints.items)
-  }
-
-  saveImageAndCsv('simple flow', drawRecord.value)
-}
-watch(saveToggle, () => {
-  printCanvas()
 })
 </script>
 

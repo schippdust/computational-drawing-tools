@@ -85,4 +85,5 @@ export {
   hexToRgb,
   getNowAsString,
   saveP5CanvasAsImage,
+  saveCsvData,
 }
