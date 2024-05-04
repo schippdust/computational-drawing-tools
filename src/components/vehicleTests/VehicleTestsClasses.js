@@ -21,17 +21,17 @@ export class MovingTarget extends BaseVehicle {
     this.s.fill(0)
     this.steerWithinBounds(this.boundsMin, this.boundsMax)
     this.update()
-    this.s.circle(this.position.x, this.position.y, this.targetRadius * 2)
+    this.s.circle(this.basePoint.x, this.basePoint.y, this.targetRadius * 2)
   }
 }
 
 export class Tracer extends BaseVehicle {
   draw() {
     this.update()
-    if (this.previousPositions.length > 1) {
-      for (let i = 0; i < this.previousPositions.length - 1; i++) {
-        let pt1 = this.previousPositions.items[i]
-        let pt2 = this.previousPositions.items[i + 1]
+    if (this.polylinePoints.length > 1) {
+      for (let i = 0; i < this.polylinePoints.length - 1; i++) {
+        let pt1 = this.polylinePoints.items[i]
+        let pt2 = this.polylinePoints.items[i + 1]
         this.s.line(pt1.x, pt1.y, pt2.x, pt2.y)
       }
     }

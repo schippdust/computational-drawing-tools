@@ -44,7 +44,7 @@ onMounted(() => {
         tracer.maxVelocity = 30
         tracer.maxSteerForce = 3
         tracer.coefOfFrict = s.random(0.5, 0.8)
-        tracer.previousPositions.maxLength = 750
+        tracer.polylinePoints.maxLength = 750
         tracer.randomizeLocation()
         tracers.push(tracer)
       }
@@ -67,7 +67,7 @@ onMounted(() => {
         movingTarget.wander()
         movingTarget.draw()
         tracers.forEach((tracer) => {
-          tracer.seak(movingTarget.position)
+          tracer.seak(movingTarget.basePoint)
           tracer.draw()
         })
       }
@@ -88,7 +88,7 @@ onMounted(() => {
 function printCanvas() {
   vehicleTestStore.resetDrawRecord()
   for (let tracer of tracers) {
-    vehicleTestStore.addPolylineToDrawRecord(tracer.previousPositions.items)
+    vehicleTestStore.addPolylineToDrawRecord(tracer.polylinePoints.items)
   }
 
   saveImageAndCsv('simple flow', drawRecord.value)

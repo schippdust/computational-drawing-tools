@@ -1,15 +1,25 @@
 import P5 from 'p5'
 import { LimitedArray } from './UtilityClasses'
+import { createUUID } from '@/store/storeUtils'
 
 export const VehicleActions = Object.freeze({
   STEER: 0,
 })
 
+export const GeometryTypes = Object.freeze({
+  POINT: 0,
+  LINE: 1,
+  POLYLINE: 2,
+})
+
 export class BaseVehicle {
   constructor(sketch, x = 0, y = 0) {
+    this.uuid = createUUID()
     this.s = sketch
-    this.position = this.s.createVector(x, y)
-    this.previousPositions = new LimitedArray(20)
+    this.basePoint = this.s.createVector(x, y)
+    this.secondPoint = undefined
+    this.geometryType = GeometryTypes.POINT
+    this.polylinePoints = new LimitedArray(20)
 
     this.velocity = this.s.createVector(0, 0)
     this.coefOfFrict = 0.7
@@ -32,12 +42,12 @@ export class BaseVehicle {
       this.applyFriction()
     }
     this.velocity.add(this.acceleration).limit(this.maxVelocity)
-    this.position.add(this.velocity)
+    this.basePoint.add(this.velocity)
     if (this.velocity.mag() < 0.00001) {
       this.velocity.mult(0)
     }
     this.acceleration.mult(0)
-    this.previousPositions.push(this.position.copy())
+    this.polylinePoints.push(this.basePoint.copy())
   }
 
   applyForce(force = this.s.createVector(0, 0)) {
@@ -67,7 +77,7 @@ export class BaseVehicle {
   // }
 
   seak(targetPosition = this.s.createVector(0, 0)) {
-    let desiredVelocity = P5.Vector.sub(targetPosition, this.position)
+    let desiredVelocity = P5.Vector.sub(targetPosition, this.basePoint)
     desiredVelocity.normalize().mult(this.maxVelocity)
     let steer = P5.Vector.sub(desiredVelocity, this.velocity)
     steer.limit(this.maxSteerForce)
@@ -77,10 +87,10 @@ export class BaseVehicle {
   wander() {
     let circleCenter = undefined
     if (this.velocity.mag() == 0) {
-      circleCenter = this.position
+      circleCenter = this.basePoint
     } else {
       circleCenter = P5.Vector.add(
-        this.position,
+        this.basePoint,
         this.velocity
           .copy()
           .setMag(this.wanderRadius * this.wanderForwardRatio),
@@ -104,14 +114,14 @@ export class BaseVehicle {
     let belowBounds = false
     let leftOfBounds = false
     let rightOfBounds = false
-    if (this.position.x < min.x) {
+    if (this.basePoint.x < min.x) {
       leftOfBounds = true
-    } else if (this.position.x > max.x) {
+    } else if (this.basePoint.x > max.x) {
       rightOfBounds = true
     }
-    if (this.position.y < min.y) {
+    if (this.basePoint.y < min.y) {
       aboveBounds = true //above and below are relative to +y axis pointing downward
-    } else if (this.position.y > max.y) {
+    } else if (this.basePoint.y > max.y) {
       belowBounds = true
     }
     if (!aboveBounds && !belowBounds && !leftOfBounds && !rightOfBounds) {
@@ -119,16 +129,16 @@ export class BaseVehicle {
     }
     let steer = this.velocity.copy()
     if (aboveBounds) {
-      steer.y = min.y - this.position.y
+      steer.y = min.y - this.basePoint.y
     } else if (belowBounds) {
-      steer.y = max.y - this.position.y
+      steer.y = max.y - this.basePoint.y
     }
     if (rightOfBounds) {
-      steer.x = max.x - this.position.x
+      steer.x = max.x - this.basePoint.x
     } else if (leftOfBounds) {
-      steer.x = min.x - this.position.x
+      steer.x = min.x - this.basePoint.x
     }
-    let target = P5.Vector.add(this.position, steer)
+    let target = P5.Vector.add(this.basePoint, steer)
     // this.applyForce(steer)
     this.seak(target)
   }
@@ -136,14 +146,43 @@ export class BaseVehicle {
   randomizeLocation() {
     let randomX = this.s.random(0, this.s.width)
     let randomY = this.s.random(0, this.s.height)
-    this.position = this.s.createVector(randomX, randomY)
+    this.basePoint = this.s.createVector(randomX, randomY)
+  }
+
+  get csvRecord() {
+    let record = '\r\n'
+    if (this.geometryType == GeometryTypes.POINT) {
+      try {
+        record = `${this.uuid},point,${this.basePoint.x},${this.basePoint.y}\r\n`
+      } catch {
+        record = `${this.uuid},ERROR,could not resolve point geometry\r\n`
+      }
+    } else if (this.geometryType == GeometryTypes.LINE) {
+      try {
+        record = `${this.uuid},line,${this.basePoint.x},${this.basePoint.y},${this.secondPoint.x},${this.secondPoint.y}\r\n`
+      } catch {
+        record = `${this.uuid},ERROR,could not resolve line geometry`
+      }
+    } else if (this.geometryType == GeometryTypes.POLYLINE) {
+      try {
+        record = ''
+        for (let i in this.polylinePoints) {
+          let v = this.polylinePoints[i]
+          record += `${this.uuid},polyline control point,${i},${v.x},${v.y}\r\n`
+        }
+      } catch {
+        record = `${this.uuid},ERROR,could not resolve polyline geometry`
+      }
+    } else {
+      record = `${this.uuid},ERROR,geometry type enum did not match draw condition`
+    }
   }
 
   get x() {
-    return this.position.x
+    return this.basePoint.x
   }
   get y() {
-    return this.position.y
+    return this.basePoint.y
   }
   get xVel() {
     return this.velocity.x
