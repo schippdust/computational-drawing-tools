@@ -17,6 +17,8 @@ export class MovingTarget extends BaseVehicle {
   }
 
   draw() {
+    this.s.stroke(255)
+    this.s.fill(0)
     this.steerWithinBounds(this.boundsMin, this.boundsMax)
     this.update()
     this.s.circle(this.position.x, this.position.y, this.targetRadius * 2)

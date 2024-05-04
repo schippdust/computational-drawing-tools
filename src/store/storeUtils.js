@@ -1,5 +1,14 @@
 import { saveAs } from 'file-saver'
 
+function createUUID() {
+  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+    ).toString(16),
+  )
+}
+
 //create full hex from a short format hex
 function fullHexFromShort(hex) {
   let r = hex.slice(1, 2)
@@ -70,6 +79,7 @@ function saveImageAndCsv(drawingName, csvDataAsString) {
 }
 
 export {
+  createUUID,
   saveImageAndCsv,
   fullHexFromShort,
   hexToRgb,

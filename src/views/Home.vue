@@ -6,6 +6,7 @@ import { useAppStore } from '@/store/app'
 const appStore = useAppStore()
 
 const { pages } = storeToRefs(appStore)
+localStorage.clear()
 </script>
 
 <template>
