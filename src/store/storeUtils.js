@@ -48,6 +48,11 @@ function getNowAsString() {
   return time
 }
 
+function saveImageAndCsv(drawingName, csvDataAsString) {
+  saveP5CanvasAsImage(drawingName)
+  saveCsvData(drawingName, csvDataAsString)
+}
+
 function saveP5CanvasAsImage(drawingName) {
   console.log('saving image')
   let classQueryResults = document.getElementsByClassName('p5Canvas')
@@ -71,11 +76,6 @@ function saveCsvData(drawingName, csvDataAsString) {
     type: 'text/csv;charset=utf-8',
   })
   saveAs(file, getNowAsString() + ' - ' + drawingName + '.csv')
-}
-
-function saveImageAndCsv(drawingName, csvDataAsString) {
-  saveP5CanvasAsImage(drawingName)
-  saveCsvData(drawingName, csvDataAsString)
 }
 
 export {

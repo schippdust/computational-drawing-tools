@@ -106,7 +106,7 @@ export class BaseVehicle {
     )
   }
 
-  steerWithinBounds(
+  steerToWithinBounds(
     min = this.s.createVector(0, 0),
     max = this.s.createVector(this.s.width, this.s.height),
   ) {
