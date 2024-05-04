@@ -1,6 +1,6 @@
 <script setup>
 import P5 from 'p5'
-import { onMounted, onBeforeUnmount } from 'vue'
+import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import {
@@ -21,7 +21,6 @@ const canvasHeight = 1500
 
 var movingTarget = undefined
 let tracers = []
-onBeforeUnmount(() => {})
 onMounted(() => {
   const sketch = (s) => {
     s.setup = () => {
