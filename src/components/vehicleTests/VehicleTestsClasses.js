@@ -1,4 +1,4 @@
-import { BaseVehicle } from '@/classes/BaseVehicle'
+import { BaseVehicle, GeometryTypes } from '@/classes/BaseVehicle'
 import P5 from 'p5'
 
 export class MovingTarget extends BaseVehicle {
@@ -26,6 +26,7 @@ export class MovingTarget extends BaseVehicle {
 }
 
 export class Tracer extends BaseVehicle {
+  geometryType = GeometryTypes.POLYLINE
   draw() {
     this.update()
     if (this.polylinePoints.length > 1) {

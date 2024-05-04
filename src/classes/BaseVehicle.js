@@ -166,8 +166,8 @@ export class BaseVehicle {
     } else if (this.geometryType == GeometryTypes.POLYLINE) {
       try {
         record = ''
-        for (let i in this.polylinePoints) {
-          let v = this.polylinePoints[i]
+        for (let i in this.polylinePoints.items) {
+          let v = this.polylinePoints.items[i]
           record += `${this.uuid},polyline control point,${i},${v.x},${v.y}\r\n`
         }
       } catch {
@@ -176,6 +176,7 @@ export class BaseVehicle {
     } else {
       record = `${this.uuid},ERROR,geometry type enum did not match draw condition`
     }
+    return record
   }
 
   get x() {

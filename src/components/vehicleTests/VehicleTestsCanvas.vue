@@ -39,7 +39,7 @@ onMounted(() => {
       movingTarget.randomizeLocation()
       console.log('moving target', movingTarget)
 
-      for (let i = 0; i < 150; i++) {
+      for (let i = 0; i < 50; i++) {
         let tracer = new Tracer(s)
         tracer.maxVelocity = 30
         tracer.maxSteerForce = 3

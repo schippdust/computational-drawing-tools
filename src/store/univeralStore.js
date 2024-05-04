@@ -3,29 +3,33 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 import { saveP5CanvasAsImage, saveCsvData } from './storeUtils'
 
+if (localStorage.getItem('print iterations') == 'null') {
+  localStorage.setItem('print iterations', 0)
+}
+
 export const useUniveralStore = defineStore('univeralStore', {
   state: () => ({
     saveToggle: false, //toggled to trigger watchers.  Not the most elegant but it works
-    drawRecord: 'id,geometry type\r\n',
+    csvRecord: 'id,geometry type\r\n',
     printIteration: localStorage.getItem('print iterations')
       ? JSON.parse(localStorage.getItem('print iterations'))
       : 0,
     maxIterations: 25,
-    automatedPrintingEnabled: false,
+    automatedPrintingEnabled: true,
     frameStepForPrinting: 250,
-    minFrameForPrinting: 850,
+    minFrameForPrinting: 100,
     maxFrameToStopPrinting: 2600,
   }),
   actions: {
     resetPrintIteration() {
       this.printIteration = 0
     },
-    resetDrawRecord() {
-      this.drawRecord = 'id,geometry type\r\n'
+    resetCsvRecord() {
+      this.csvRecord = 'id,geometry type\r\n'
     },
-    addVehicleToCsvRecord(vehicles) {
-      for (vehicle of vehicles) {
-        this.drawRecord += vehicle.csvRecord
+    addVehiclesToCsvRecord(vehicles) {
+      for (let vehicle of vehicles) {
+        this.csvRecord += vehicle.csvRecord
       }
     },
     saveDrawingRecord(fileName, savePng = true, saveCsv = true) {
@@ -33,7 +37,7 @@ export const useUniveralStore = defineStore('univeralStore', {
         saveP5CanvasAsImage(fileName)
       }
       if (saveCsv) {
-        saveCsvData(fileName, this.drawRecord)
+        saveCsvData(fileName, this.csvRecord)
       }
     },
     automatedPrint(
@@ -43,21 +47,22 @@ export const useUniveralStore = defineStore('univeralStore', {
       savePng = true,
       saveCsv = true,
     ) {
-      if (this.automatedPrint) {
+      if (this.automatedPrintingEnabled) {
         if (
           frame % this.frameStepForPrinting == 0 &&
           frame >= this.minFrameForPrinting &&
           frame < this.maxFrameToStopPrinting
         ) {
-          this.resetDrawRecord()
-          for (let vehicle of vehicles) {
-            this.addVehicleToCsvRecord(vehilce)
+          if (saveCsv) {
+            this.resetCsvRecord()
+            this.addVehiclesToCsvRecord(vehicles)
           }
           this.saveDrawingRecord(fileName, savePng, saveCsv)
         }
         if (frame >= this.maxFrameToStopPrinting) {
           this.printIteration += 1
-          if (this.printIteration < maxIterations) {
+          localStorage.setItem('print iterations', this.printIteration)
+          if (this.printIteration < this.maxIterations) {
             router.go()
           } else {
             console.log('navigating')
