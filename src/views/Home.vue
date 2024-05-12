@@ -6,7 +6,7 @@ import { useAppStore } from '@/store/app'
 const appStore = useAppStore()
 const { pages } = storeToRefs(appStore)
 
-import { useUniveralStore } from '@/store/univeralStore';
+import { useUniveralStore } from '@/store/univeralStore'
 const univeralStore = useUniveralStore()
 
 onMounted(() => {
