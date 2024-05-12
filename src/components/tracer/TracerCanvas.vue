@@ -3,18 +3,15 @@ import P5 from 'p5'
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 
-import {
-  MovingTarget,
-  Tracer,
-} from '@/components/vehicleTests/VehicleTestsClasses.js'
+import { MovingTarget, Tracer } from '@/components/tracer/TracerClasses.js'
 
 import { useUniveralStore } from '@/store/univeralStore'
 const universalStore = useUniveralStore()
 
-import { useVehicleTestStore } from '@/store/vehicleTestStore'
+import { useTracerStore } from '@/store/tracerStore'
 
-const vehicleTestStore = useVehicleTestStore()
-const { playing } = storeToRefs(vehicleTestStore)
+const tracerStore = useTracerStore()
+const { playing } = storeToRefs(tracerStore)
 
 const canvasWidth = 1500
 const canvasHeight = 1500
@@ -80,3 +77,4 @@ onMounted(() => {
     </v-row>
   </v-container>
 </template>
+@/components/tracers/TracerClasses.js

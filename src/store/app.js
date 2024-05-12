@@ -17,10 +17,10 @@ export const useAppStore = defineStore('app', {
         path: 'connections',
       },
       {
-        title: 'Vehicle Tests',
+        title: 'Tracers',
         description:
-          'A development focused sketch for testing various vehicle behaviors',
-        path: 'vehicle-tests',
+          'A set of lines that chase a target around the screen, creating "tracers" that slowly converge on one another over time.',
+        path: 'tracer',
       },
     ],
   }),

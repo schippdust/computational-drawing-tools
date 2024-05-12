@@ -1,12 +1,12 @@
 <script setup>
 import router from '@/router'
-import VehicleTestCanvas from '@/components/vehicleTests/VehicleTestsCanvas.vue'
-import { useVehicleTestStore } from '@/store/vehicleTestStore.js'
+import tracerCanvas from '@/components/tracer/TracerCanvas.vue'
+import { useTracerStore } from '@/store/tracerStore.js'
 
 import { storeToRefs } from 'pinia'
 
-const vehicleTestStore = useVehicleTestStore()
-const { playing, saveToggle, drawRecord } = storeToRefs(vehicleTestStore)
+const tracerStore = useTracerStore()
+const { playing, saveToggle, drawRecord } = storeToRefs(tracerStore)
 
 function saveImagePressed() {
   // saveImageAndCsv('simple flow', drawRecord)
@@ -32,7 +32,7 @@ function saveImagePressed() {
           :color="playing ? 'green' : 'orange'"
           dark
           title="Toggle Playing"
-          @click="vehicleTestStore.togglePlaying"
+          @click="tracerStore.togglePlaying"
         >
           <v-icon v-if="playing" class="ma-0">mdi-play</v-icon>
           <v-icon v-else class="ma-0">mdi-pause</v-icon>
@@ -55,5 +55,5 @@ function saveImagePressed() {
       </v-col>
     </v-row>
   </v-container>
-  <vehicleTestCanvas />
+  <tracerCanvas />
 </template>

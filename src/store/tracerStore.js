@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-export const useVehicleTestStore = defineStore('vehicleTestStore', {
+export const useTracerStore = defineStore('tracerStore', {
   state: () => ({
     playing: true,
   }),
