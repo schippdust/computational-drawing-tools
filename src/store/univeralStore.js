@@ -23,6 +23,7 @@ export const useUniveralStore = defineStore('univeralStore', {
   actions: {
     resetPrintIteration() {
       this.printIteration = 0
+      localStorage.setItem('print iterations', 0)
     },
     resetCsvRecord() {
       this.csvRecord = 'id,geometry type\r\n'

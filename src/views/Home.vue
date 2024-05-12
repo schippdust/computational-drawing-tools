@@ -1,11 +1,18 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+
 import { useAppStore } from '@/store/app'
-
 const appStore = useAppStore()
-
 const { pages } = storeToRefs(appStore)
+
+import { useUniveralStore } from '@/store/univeralStore';
+const univeralStore = useUniveralStore()
+
+onMounted(() => {
+  univeralStore.resetPrintIteration()
+})
+
 localStorage.clear()
 </script>
 
