@@ -15,7 +15,7 @@ onMounted(() => {
 })
 
 const nonHomePages = computed(() => {
-  return pages.value.filter((p) => p.title != 'Home')
+  return pages.value.filter((p) => p.title != 'Home' && p.title != 'Blank')
 })
 
 localStorage.clear()

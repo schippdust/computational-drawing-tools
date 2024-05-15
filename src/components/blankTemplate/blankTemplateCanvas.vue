@@ -14,7 +14,8 @@ import {} from './blankTemplateClasses'
 //IMPORT STORE ASSOCIATED WITH DRAWING
 import { useBlankTemplateStore } from '@/store/blankTemplateStore'
 const blankTemplateStore = useBlankTemplateStore()
-const { canvasWidth, canvasHeight } = storeToRefs(blankTemplateStore)
+const { canvasWidth, canvasHeight, sketchName } =
+  storeToRefs(blankTemplateStore)
 
 let vehicles = []
 var activeSketch = undefined
@@ -37,7 +38,7 @@ var sketch = (s) => {
     univeralStore.automatedPrint(
       s.frameCount,
       vehicles,
-      'blankCanvas',
+      sketchName.value,
       true,
       false,
     )
@@ -57,7 +58,7 @@ watch(playing, () => {
 })
 
 watch(printToggleWatcher, () => {
-  univeralStore.print(vehicles, 'blankTemplate', true, false)
+  univeralStore.print(vehicles, sketchName.value, true, false)
 })
 
 onUnmounted(() => {
