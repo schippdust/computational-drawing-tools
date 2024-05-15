@@ -9,6 +9,7 @@ if (localStorage.getItem('print iterations') == 'null') {
 
 export const useUniveralStore = defineStore('univeralStore', {
   state: () => ({
+    playing: true,
     saveToggle: false, //toggled to trigger watchers.  Not the most elegant but it works
     csvRecord: 'id,geometry type\r\n',
     printIteration: localStorage.getItem('print iterations')
@@ -19,6 +20,7 @@ export const useUniveralStore = defineStore('univeralStore', {
     frameStepForPrinting: 250,
     minFrameForPrinting: 100,
     maxFrameToStopPrinting: 2600,
+    printToggleWatcher: false,
   }),
   actions: {
     resetPrintIteration() {
@@ -54,11 +56,7 @@ export const useUniveralStore = defineStore('univeralStore', {
           frame >= this.minFrameForPrinting &&
           frame < this.maxFrameToStopPrinting
         ) {
-          if (saveCsv) {
-            this.resetCsvRecord()
-            this.addVehiclesToCsvRecord(vehicles)
-          }
-          this.saveDrawingRecord(fileName, savePng, saveCsv)
+          this.print(vehicles, fileName, savePng, saveCsv)
         }
         if (frame >= this.maxFrameToStopPrinting) {
           this.printIteration += 1
@@ -71,6 +69,13 @@ export const useUniveralStore = defineStore('univeralStore', {
           }
         }
       }
+    },
+    print(vehicles, fileName = 'sketch', savePng = true, saveCsv = true) {
+      if (saveCsv) {
+        this.resetCsvRecord()
+        this.addVehiclesToCsvRecord(vehicles)
+      }
+      this.saveDrawingRecord(fileName, savePng, saveCsv)
     },
   },
 })

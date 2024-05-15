@@ -1,16 +1,14 @@
 <script setup>
 import router from '@/router'
 import tracerCanvas from '@/components/tracer/TracerCanvas.vue'
-import { useTracerStore } from '@/store/tracerStore.js'
-
 import { storeToRefs } from 'pinia'
 
-const tracerStore = useTracerStore()
-const { playing, saveToggle, drawRecord } = storeToRefs(tracerStore)
+import { useUniveralStore } from '@/store/univeralStore'
+const univeralStore = useUniveralStore()
+const { playing, printToggleWatcher } = storeToRefs(univeralStore)
 
 function saveImagePressed() {
-  // saveImageAndCsv('simple flow', drawRecord)
-  saveToggle.value = !saveToggle.value
+  printToggleWatcher.value = !printToggleWatcher.value
 }
 </script>
 
@@ -32,7 +30,7 @@ function saveImagePressed() {
           :color="playing ? 'green' : 'orange'"
           dark
           title="Toggle Playing"
-          @click="tracerStore.togglePlaying"
+          @click="playing = !playing"
         >
           <v-icon v-if="playing" class="ma-0">mdi-play</v-icon>
           <v-icon v-else class="ma-0">mdi-pause</v-icon>

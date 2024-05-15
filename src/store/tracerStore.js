@@ -1,11 +1,7 @@
 import { defineStore } from 'pinia'
 export const useTracerStore = defineStore('tracerStore', {
   state: () => ({
-    playing: true,
+    canvasWidth: 1500,
+    canvasHeight: 1500,
   }),
-  actions: {
-    togglePlaying() {
-      this.playing = !this.playing
-    },
-  },
 })
