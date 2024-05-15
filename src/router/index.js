@@ -1,32 +1,18 @@
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
+import { defaultPageData } from '@/store/appStore'
 
 const routes = [
   {
     path: '/',
     component: () => import('@/layouts/default/DefaultLayout.vue'),
-    children: [
-      {
-        path: '',
-        name: 'Home',
-        component: () => import('@/views/Home.vue'),
-      },
-      {
-        path: 'flow-field',
-        name: 'Flow Field',
-        component: () => import('@/views/FlowField.vue'),
-      },
-      {
-        path: 'connections',
-        name: 'Connections',
-        component: () => import('@/views/Connections.vue'),
-      },
-      {
-        path: 'tracer',
-        name: 'Tracers',
-        component: () => import('@/views/Tracer.vue'),
-      },
-    ],
+    children: defaultPageData.map((d) => {
+      return {
+        path: d.path,
+        name: d.title,
+        component: () => import(`../views/${d.component}.vue`),
+      }
+    }),
   },
 ]
 
