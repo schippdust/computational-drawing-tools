@@ -37,6 +37,12 @@ export const defaultPageData = [
     description:
       'A blank canvas that can be used as a template for creating new computational drawings.',
   },
+  {
+    title: 'Complex Tracers',
+    path: 'complex-tracers',
+    component: 'ComplexTracers',
+    description: '',
+  },
 ]
 
 export const useAppStore = defineStore('app', {

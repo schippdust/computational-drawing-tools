@@ -16,10 +16,10 @@ Copy and rename the following components into their same directories with an upd
 
 - **@/components/blankTemplate/blankTemplateClasses.js** | This is the file where all extensions of the base classes specific to the given drawing are kept. Custom classes can be kept here as well, but try to extend existing classes when possible.
 
-## 2. Update the Routes in the App Store
-
-In the **@/store/appStore.js** file add a new "page" object to the _DefaultPageData_ const array. This will be read by the Vue Router when creating child routes for the primary layout. Make sure the component name matches exactly the copied and renamed component under the **@/views/** directory, excluding the ".vue" file type.
-
-## 3. Go Through Each Copied File and Fix Imports
+## 2. Go Through Each Copied File and Fix Imports
 
 Go through each of the copied and renamed files from step 1 and fix their import statments to make use of this new set of components rather than the default "blankTemplate" components
+
+## 3. Update the Routes in the App Store
+
+In the **@/store/appStore.js** file add a new "page" object to the _DefaultPageData_ const array. This will be read by the Vue Router when creating child routes for the primary layout. Make sure the component name matches exactly the copied and renamed component under the **@/views/** directory, excluding the ".vue" file type.
