@@ -106,6 +106,33 @@ export class BaseVehicle {
     )
   }
 
+  arrive(targetPosition = this.s.createVector(0, 0)) {
+    let desiredVelocity = P5.Vector.sub(targetPosition, this.basePoint)
+    let desiredMagnitude = desiredVelocity.mag()
+    desiredVelocity.normalize()
+
+    let maxAccel = Math.sqrt(this.maxSteerForce / this.mass)
+    let extraFrames = 3
+    let framesToStop = this.maxVelocity / maxAccel + extraFrames
+    let decelRadius = framesToStop * this.maxVelocity
+
+    if (desiredMagnitude < decelRadius) {
+      let mappedMagnitude = this.s.map(
+        desiredMagnitude,
+        0,
+        decelRadius,
+        0,
+        this.maxVelocity,
+      )
+      desiredVelocity.mult(mappedMagnitude)
+    } else {
+      desiredVelocity.mult(this.maxVelocity)
+    }
+    let steer = P5.Vector.sub(desiredVelocity, this.velocity)
+    steer.limit(this.maxSteerForce)
+    this.applyForce(steer)
+  }
+
   steerToWithinBounds(
     min = this.s.createVector(0, 0),
     max = this.s.createVector(this.s.width, this.s.height),
