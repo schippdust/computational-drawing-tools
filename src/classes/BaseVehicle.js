@@ -65,17 +65,6 @@ export class BaseVehicle {
     this.applyForce(friction)
   }
 
-  // Logic to select behavior may be appropriate in this class, or may be more appropriate in extensions of this class
-  // based on the application desired in its implementations
-  // DECIDE LATER
-
-  //Vehicles Logic
-  // selectAction(action,steering=this.s.createVector(0,0)){
-  //     if (action == VehicleActions.STEER){
-  //         this.steer()
-  //     }
-  // }
-
   seak(targetPosition = this.s.createVector(0, 0)) {
     let desiredVelocity = P5.Vector.sub(targetPosition, this.basePoint)
     desiredVelocity.normalize().mult(this.maxVelocity)
