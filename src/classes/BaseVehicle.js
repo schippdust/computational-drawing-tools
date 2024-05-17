@@ -35,6 +35,8 @@ export class BaseVehicle {
     this.wanderForwardRatio = 9 / 10
     this.maxWanderAdjustment = (2 * Math.PI) / 10
     this.wanderPointRadians = this.s.random(0, 2 * Math.PI)
+
+    this.neighbors = []
   }
 
   update(applyFriction = true) {
@@ -48,6 +50,8 @@ export class BaseVehicle {
     }
     this.acceleration.mult(0)
     this.polylinePoints.push(this.basePoint.copy())
+
+    this.neighbors = []
   }
 
   applyForce(force = this.s.createVector(0, 0)) {
