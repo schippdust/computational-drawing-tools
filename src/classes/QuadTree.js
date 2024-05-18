@@ -1,5 +1,3 @@
-import { search } from 'core-js/fn/symbol'
-
 export class QuadTree {
   constructor(sketch, boundary, quadCapacity = 10) {
     this.s = sketch
@@ -80,5 +78,39 @@ export class QuadTree {
     }
 
     return results
+  }
+
+  getAllVehicles() {
+    let vehicles = []
+
+    vehicles = vehicles.concat(this.vehicles)
+
+    if (this.divided) {
+      vehicles = vehicles.concat(this.northeast.getAllVehicles())
+      vehicles = vehicles.concat(this.northwest.getAllVehicles())
+      vehicles = vehicles.concat(this.southeast.getAllVehicles())
+      vehicles = vehicles.concat(this.southwest.getAllVehicles())
+    }
+
+    return vehicles
+  }
+
+  deleteVehicle(vehicle) {
+    if (!this.boundary.contains(vehicle.basePoint)) {
+      return false
+    }
+
+    let index = this.vehicles.indexOf(vehicle)
+    if (index !== -1) {
+      this.vehicles.filter((v) => v != vehicle)
+      return true
+    } else if (this.divided) {
+      if (this.northeast.deleteVehicle(vehicle)) return true
+      if (this.northwest.deleteVehicle(vehicle)) return true
+      if (this.southeast.deleteVehicle(vehicle)) return true
+      if (this.southwest.deleteVehicle(vehicle)) return true
+    } else {
+      return false
+    }
   }
 }
