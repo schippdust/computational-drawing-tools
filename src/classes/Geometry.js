@@ -1,5 +1,5 @@
 //Geometry utilities to use in different
-import { clamp } from '@/store/storeUtils'
+import { clamp } from './UtilityClasses'
 
 export class Rectangle {
   constructor(x, y, w, h, sketch) {
