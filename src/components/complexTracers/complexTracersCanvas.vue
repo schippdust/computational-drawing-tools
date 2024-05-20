@@ -9,15 +9,18 @@ const { playing, printToggleWatcher } = storeToRefs(univeralStore)
 playing.value = true
 
 //IMPORT CLASSES ASSOCIATED WITH DRAWING
-import {} from './complexTracersClasses'
+import { ConnectedWanderer } from './complexTracersClasses'
 
 //IMPORT STORE ASSOCIATED WITH DRAWING
 import { useComplexTracersStore } from '@/store/complexTracersStore'
+import { Rectangle } from '@/classes/Geometry'
+import { QuadTree } from '@/classes/QuadTree'
 const complexTracersStore = useComplexTracersStore()
 const { canvasWidth, canvasHeight, sketchName } =
   storeToRefs(complexTracersStore)
 
-let vehicles = []
+var vehicles = []
+var linkRecords = []
 var activeSketch = undefined
 
 var sketch = (s) => {
@@ -25,22 +28,46 @@ var sketch = (s) => {
     s.createCanvas(canvasWidth.value, canvasHeight.value)
     s.background(0)
     s.frameRate(30)
-    console.log('setup initialized')
+    console.log('complex tracers setup initialized')
+
+    for (let i = 0; i < 100; i++) {
+      let connectedWanderer = new ConnectedWanderer(s)
+      vehicles.push(connectedWanderer)
+    }
   }
 
   s.draw = () => {
+    let connectionsLog = []
     if (s.frameCount % 50 == 0) {
       console.log(s.frameCount)
     }
+    vehicles.forEach((v) => {
+      v.wander()
+      v.steerToWithinBounds()
+      v.update()
+    })
+    let quadTreeBounds = new Rectangle(s)
+    let quadTree = new QuadTree(s, quadTreeBounds)
+    vehicles.forEach((v) => {
+      quadTree.insert(v)
+    })
+    vehicles.forEach((v) => {
+      v.neighbors = quadTree.queryRange(v, 200)
+    })
+    vehicles.forEach((v) => {
+      let newLinkRecords = v.draw(connectionsLog)
+      connectionsLog = [...connectionsLog, ...newLinkRecords.map((r) => r.log)]
+      linkRecords = [...linkRecords, ...newLinkRecords]
+    })
 
     //update elements
 
     univeralStore.automatedPrint(
       s.frameCount,
-      vehicles,
+      linkRecords,
       sketchName.value,
       true,
-      false,
+      true,
     )
   }
 }

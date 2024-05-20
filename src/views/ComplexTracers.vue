@@ -1,6 +1,6 @@
 <script setup>
 import router from '@/router'
-import blankCanvas from '@/components/blankTemplate/blankTemplateCanvas.vue'
+import complexTracersCanvas from '@/components/complexTracers/complexTracersCanvas.vue'
 import { storeToRefs } from 'pinia'
 
 import { useUniveralStore } from '@/store/univeralStore'
@@ -53,5 +53,5 @@ function saveImagePressed() {
       </v-col>
     </v-row>
   </v-container>
-  <blankCanvas />
+  <complexTracersCanvas />
 </template>

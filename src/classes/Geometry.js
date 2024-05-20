@@ -2,7 +2,7 @@
 import { clamp } from './UtilityClasses'
 
 export class Rectangle {
-  constructor(x, y, w, h, sketch) {
+  constructor(sketch, x = 0, y = 0, w = sketch.width, h = sketch.height) {
     this.x = x
     this.y = y
     this.w = w

@@ -36,6 +36,7 @@ export class BaseVehicle {
     this.maxWanderAdjustment = (2 * Math.PI) / 10
     this.wanderPointRadians = this.s.random(0, 2 * Math.PI)
 
+    this.quadTree = undefined
     this.neighbors = []
   }
 
@@ -167,6 +168,17 @@ export class BaseVehicle {
     let randomX = this.s.random(0, this.s.width)
     let randomY = this.s.random(0, this.s.height)
     this.basePoint = this.s.createVector(randomX, randomY)
+  }
+
+  identifyNeighbors(distance = 100) {
+    if (this.quadTree) {
+      return this.quadTree.queryRange(this, distance)
+    } else {
+      console.log(
+        'WARNING: no quad tree was defined when searching for neighbors',
+      )
+      return []
+    }
   }
 
   get csvRecord() {

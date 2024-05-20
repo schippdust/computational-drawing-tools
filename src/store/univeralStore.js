@@ -72,6 +72,7 @@ export const useUniveralStore = defineStore('univeralStore', {
     },
     print(vehicles, fileName = 'sketch', savePng = true, saveCsv = true) {
       if (saveCsv) {
+        console.log('saving csv')
         this.resetCsvRecord()
         this.addVehiclesToCsvRecord(vehicles)
       }
