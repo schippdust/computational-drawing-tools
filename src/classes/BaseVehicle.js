@@ -38,6 +38,7 @@ export class BaseVehicle {
 
     this.quadTree = undefined
     this.neighbors = []
+    this.desiredSeparation = 40
   }
 
   update(applyFriction = true) {
@@ -70,7 +71,7 @@ export class BaseVehicle {
     this.applyForce(friction)
   }
 
-  seak(targetPosition = this.s.createVector(0, 0)) {
+  seakAtMaxVelocity(targetPosition = this.s.createVector(0, 0)) {
     let desiredVelocity = P5.Vector.sub(targetPosition, this.basePoint)
     desiredVelocity.normalize().mult(this.maxVelocity)
     let steer = P5.Vector.sub(desiredVelocity, this.velocity)
@@ -93,7 +94,7 @@ export class BaseVehicle {
     let targetX = Math.cos(this.wanderPointRadians) * this.wanderRadius
     let targetY = Math.sin(this.wanderPointRadians) * this.wanderRadius
     let targetPoint = this.s.createVector(targetX, targetY).add(circleCenter)
-    this.seak(targetPoint)
+    this.seakAtMaxVelocity(targetPoint)
     this.wanderPointRadians += this.s.random(
       this.maxWanderAdjustment * -1,
       this.maxWanderAdjustment,
@@ -161,7 +162,29 @@ export class BaseVehicle {
     }
     let target = P5.Vector.add(this.basePoint, steer)
     // this.applyForce(steer)
-    this.seak(target)
+    this.seakAtMaxVelocity(target)
+  }
+
+  separate(otherVehicles = this.neighbors) {
+    let countOfVehiclesTooClose = 0
+    let sumOfSeparateVects = this.s.createVector(0, 0)
+
+    for (let v of otherVehicles) {
+      let d = P5.Vector.dist(this.basePoint, v.basePoint)
+
+      if (d > 0 && d < this.desiredSeparation) {
+        let diff = P5.Vector.sub(this.basePoint, v.basePoint).normalize().div(d)
+        sumOfSeparateVects.add(diff)
+        countOfVehiclesTooClose += 1
+      }
+    }
+
+    if (countOfVehiclesTooClose > 0) {
+      sumOfSeparateVects.div(countOfVehiclesTooClose)
+    }
+
+    let targetPoint = P5.Vector.add(this.basePoint, sumOfSeparateVects)
+    this.seakAtMaxVelocity(targetPoint)
   }
 
   randomizeLocation() {
@@ -171,6 +194,11 @@ export class BaseVehicle {
   }
 
   identifyNeighbors(distance = 100) {
+    if (distance < this.desiredSeparation) {
+      console.log(
+        'WARNING: NEIGHBOR DISTANCE IS LESS THAN DESIRED SEPARATION, THIS MAY CAUSE UNINTENDED BEHAVIORS',
+      )
+    }
     if (this.quadTree) {
       return this.quadTree.queryRange(this, distance)
     } else {
