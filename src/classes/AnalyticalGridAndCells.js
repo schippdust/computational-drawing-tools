@@ -4,9 +4,11 @@ import { BaseSketchElement } from './BaseSketchElement'
 import { QuadTree } from './QuadTree'
 
 export class AnalyticalGridCell extends BaseSketchElement {
-  constructor(sketch, x, y, w, h) {
+  constructor(sketch, x, y, w, h, i, j) {
     super(sketch, x + w / 2, y + h / 2)
     this.rectangle = Rectangle(sketch, x, y, w, h)
+    this.i = i
+    this.j = j
   }
 }
 
@@ -28,11 +30,13 @@ export class AnalyticalGrid extends BaseSketchElement {
     this.rowCount = this.s.floor(height / cellDim)
     if (this.xMargin > 0) {
       this.columnCount += 2
-      xCursor -= this.xMargin
+      xCursor += this.xMargin
+      xCursor -= this.cellDim
     }
     if (this.yMargin > 0) {
       this.rowCount += 2
-      yCursor -= this.yMargin
+      yCursor += this.yMargin
+      yCursor -= this.cellDim
     }
 
     this.minX = xCursor
@@ -47,6 +51,8 @@ export class AnalyticalGrid extends BaseSketchElement {
           yCursor,
           this.cellDim,
           this.cellDim,
+          i,
+          j,
         )
         columnCells.push(cell)
         yCursor += this.cellDim
@@ -57,15 +63,45 @@ export class AnalyticalGrid extends BaseSketchElement {
     }
   }
 
-  getCellByPosition(posVect){
-
+  calculateIndexByPosition(posVect){
+    let x = posVect.x
+    let y = posVect.y
+    
   }
-  
-  queryCellsByVehicles(vehicles){
-    if (!Array.isArray(vehicles)){
+
+  getCellByPosition(posVect) {
+    let x = posVect.x
+    let y = posVect.y
+    let xCursor = this.minX
+    let yCursor = this.minY
+    for (let i = 0; i < this.colCount; i++) {
+      for (let j = 0; j < this.rowCount; j++) {
+        let xInRange = x >= xCursor && x < xCursor + this.cellDim
+        let yInRange = y >= yCursor && y < yCursor + this.cellDim
+        if (xInRange && yInRange) {
+          return this.cells[i][j]
+          break
+        }
+        yCursor += this.cellDim
+      }
+      xCursor += this.cellDim
+    }
+    return undefined
+
+    // how could I calculate i and j by position?
+  }
+
+  queryCellsByVehicles(vehicles) {
+    let identifiedCells = []
+    if (!Array.isArray(vehicles)) {
       vehicles = [vehicles]
     }
-
-
+    for (let vehicle of vehicles){
+      let identifiedCell = this.getCellByPosition(vehicle.originPoint)
+      if (identifiedCell && !identifiedCells.includes(identifiedCell)){
+        identifiedCells.push(identifiedCell)
+      }
+    }
+    return identifiedCells
   }
 }
