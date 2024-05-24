@@ -56,4 +56,16 @@ export class AnalyticalGrid extends BaseSketchElement {
       xCursor += this.cellDim
     }
   }
+
+  getCellByPosition(posVect){
+
+  }
+  
+  queryCellsByVehicles(vehicles){
+    if (!Array.isArray(vehicles)){
+      vehicles = [vehicles]
+    }
+
+
+  }
 }
