@@ -1,4 +1,5 @@
-import { BaseVehicle, GeometryTypes } from '@/classes/BaseVehicle'
+import { BaseVehicle } from '@/classes/BaseVehicle'
+import { ElementGeometryTypes } from '@/classes/BaseSketchElement'
 import P5 from 'p5'
 
 export class MovingTarget extends BaseVehicle {
@@ -18,12 +19,12 @@ export class MovingTarget extends BaseVehicle {
     this.s.fill(0)
     this.steerToWithinBounds(this.boundsMin, this.boundsMax)
     this.update()
-    this.s.circle(this.basePoint.x, this.basePoint.y, this.targetRadius * 2)
+    this.s.circle(this.originPoint.x, this.originPoint.y, this.targetRadius * 2)
   }
 }
 
 export class Tracer extends BaseVehicle {
-  geometryType = GeometryTypes.POLYLINE
+  geometryType = ElementGeometryTypes.POLYLINE
   draw() {
     this.update()
     if (this.polylinePoints.length > 1) {

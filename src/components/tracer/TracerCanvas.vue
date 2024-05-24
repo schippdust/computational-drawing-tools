@@ -50,7 +50,7 @@ var sketch = (s) => {
     movingTarget.wander()
     movingTarget.draw()
     tracers.forEach((tracer) => {
-      tracer.seak(movingTarget.basePoint)
+      tracer.seakAtMaxVelocity(movingTarget.originPoint)
       tracer.draw()
     })
 

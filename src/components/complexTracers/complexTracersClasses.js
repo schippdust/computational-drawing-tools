@@ -1,5 +1,6 @@
-import { BaseVehicle, GeometryTypes } from '@/classes/BaseVehicle'
+import { BaseVehicle } from '@/classes/BaseVehicle'
 import { createUUID } from '@/store/storeUtils'
+import { ElementGeometryTypes } from '@/classes/BaseSketchElement'
 import P5 from 'p5'
 export class ConnectedWanderer extends BaseVehicle {
   constructor(sketch) {
@@ -25,19 +26,19 @@ export class ConnectedWanderer extends BaseVehicle {
       if (!connectionsLog.includes(connectionId)) {
         let record = new LinkRecord(
           connectionId,
-          this.basePoint,
-          neighbor.basePoint,
+          this.originPoint,
+          neighbor.originPoint,
         )
         records.push(record)
         this.s.line(
-          this.basePoint.x,
-          this.basePoint.y,
-          neighbor.basePoint.x,
-          neighbor.basePoint.y,
+          this.originPoint.x,
+          this.originPoint.y,
+          neighbor.originPoint.x,
+          neighbor.originPoint.y,
         )
       }
     }
-    // this.s.circle(this.basePoint.x, this.basePoint.y, 2)
+    // this.s.circle(this.originPoint.x, this.originPoint.y, 2)
     return records
   }
 }

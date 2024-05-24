@@ -1,25 +1,18 @@
 import P5 from 'p5'
 import { LimitedArray } from './UtilityClasses'
-import { createUUID } from '@/store/storeUtils'
 
 export const VehicleActions = Object.freeze({
   STEER: 0,
 })
 
-export const GeometryTypes = Object.freeze({
-  POINT: 0,
-  LINE: 1,
-  POLYLINE: 2,
-})
+import { BaseSketchElement, ElementGeometryTypes } from './BaseSketchElement'
 
-export class BaseVehicle {
+export class BaseVehicle extends BaseSketchElement {
   constructor(sketch, x = 0, y = 0) {
-    this.uuid = createUUID()
-    this.s = sketch
-    this.basePoint = this.s.createVector(x, y)
-    this.secondPoint = undefined
-    this.geometryType = GeometryTypes.POINT
-    this.polylinePoints = new LimitedArray(20)
+    super(sketch, x, y)
+    this.secondPoint = undefined //useful for extension, can export to csv as line between two points
+    this.geometryType = ElementGeometryTypes.POINT
+    this.polylinePoints = new LimitedArray(20) //useful for extension, can export to csv as polyline between two points
 
     this.velocity = this.s.createVector(0, 0)
     this.coefOfFrict = 0.7
@@ -36,8 +29,6 @@ export class BaseVehicle {
     this.maxWanderAdjustment = (2 * Math.PI) / 10
     this.wanderPointRadians = this.s.random(0, 2 * Math.PI)
 
-    this.quadTree = undefined
-    this.neighbors = []
     this.desiredSeparation = 40
   }
 
@@ -46,12 +37,12 @@ export class BaseVehicle {
       this.applyFriction()
     }
     this.velocity.add(this.acceleration).limit(this.maxVelocity)
-    this.basePoint.add(this.velocity)
+    this.originPoint.add(this.velocity)
     if (this.velocity.mag() < 0.00001) {
       this.velocity.mult(0)
     }
     this.acceleration.mult(0)
-    this.polylinePoints.push(this.basePoint.copy())
+    this.polylinePoints.push(this.originPoint.copy())
 
     this.neighbors = []
   }
@@ -72,7 +63,7 @@ export class BaseVehicle {
   }
 
   seakAtMaxVelocity(targetPosition = this.s.createVector(0, 0)) {
-    let desiredVelocity = P5.Vector.sub(targetPosition, this.basePoint)
+    let desiredVelocity = P5.Vector.sub(targetPosition, this.originPoint)
     desiredVelocity.normalize().mult(this.maxVelocity)
     let steer = P5.Vector.sub(desiredVelocity, this.velocity)
     steer.limit(this.maxSteerForce)
@@ -82,10 +73,10 @@ export class BaseVehicle {
   wander() {
     let circleCenter = undefined
     if (this.velocity.mag() == 0) {
-      circleCenter = this.basePoint
+      circleCenter = this.originPoint
     } else {
       circleCenter = P5.Vector.add(
-        this.basePoint,
+        this.originPoint,
         this.velocity
           .copy()
           .setMag(this.wanderRadius * this.wanderForwardRatio),
@@ -102,7 +93,7 @@ export class BaseVehicle {
   }
 
   arrive(targetPosition = this.s.createVector(0, 0)) {
-    let desiredVelocity = P5.Vector.sub(targetPosition, this.basePoint)
+    let desiredVelocity = P5.Vector.sub(targetPosition, this.originPoint)
     let desiredMagnitude = desiredVelocity.mag()
     desiredVelocity.normalize()
 
@@ -136,14 +127,14 @@ export class BaseVehicle {
     let belowBounds = false
     let leftOfBounds = false
     let rightOfBounds = false
-    if (this.basePoint.x < min.x) {
+    if (this.originPoint.x < min.x) {
       leftOfBounds = true
-    } else if (this.basePoint.x > max.x) {
+    } else if (this.originPoint.x > max.x) {
       rightOfBounds = true
     }
-    if (this.basePoint.y < min.y) {
+    if (this.originPoint.y < min.y) {
       aboveBounds = true //above and below are relative to +y axis pointing downward
-    } else if (this.basePoint.y > max.y) {
+    } else if (this.originPoint.y > max.y) {
       belowBounds = true
     }
     if (!aboveBounds && !belowBounds && !leftOfBounds && !rightOfBounds) {
@@ -151,16 +142,16 @@ export class BaseVehicle {
     }
     let steer = this.velocity.copy()
     if (aboveBounds) {
-      steer.y = min.y - this.basePoint.y
+      steer.y = min.y - this.originPoint.y
     } else if (belowBounds) {
-      steer.y = max.y - this.basePoint.y
+      steer.y = max.y - this.originPoint.y
     }
     if (rightOfBounds) {
-      steer.x = max.x - this.basePoint.x
+      steer.x = max.x - this.originPoint.x
     } else if (leftOfBounds) {
-      steer.x = min.x - this.basePoint.x
+      steer.x = min.x - this.originPoint.x
     }
-    let target = P5.Vector.add(this.basePoint, steer)
+    let target = P5.Vector.add(this.originPoint, steer)
     // this.applyForce(steer)
     this.seakAtMaxVelocity(target)
   }
@@ -170,10 +161,12 @@ export class BaseVehicle {
     let sumOfSeparateVects = this.s.createVector(0, 0)
 
     for (let v of otherVehicles) {
-      let d = P5.Vector.dist(this.basePoint, v.basePoint)
+      let d = P5.Vector.dist(this.originPoint, v.originPoint)
 
       if (d > 0 && d < this.desiredSeparation) {
-        let diff = P5.Vector.sub(this.basePoint, v.basePoint).normalize().div(d)
+        let diff = P5.Vector.sub(this.originPoint, v.originPoint)
+          .normalize()
+          .div(d)
         sumOfSeparateVects.add(diff)
         countOfVehiclesTooClose += 1
       }
@@ -183,14 +176,14 @@ export class BaseVehicle {
       sumOfSeparateVects.div(countOfVehiclesTooClose)
     }
 
-    let targetPoint = P5.Vector.add(this.basePoint, sumOfSeparateVects)
+    let targetPoint = P5.Vector.add(this.originPoint, sumOfSeparateVects)
     this.seakAtMaxVelocity(targetPoint)
   }
 
   randomizeLocation() {
     let randomX = this.s.random(0, this.s.width)
     let randomY = this.s.random(0, this.s.height)
-    this.basePoint = this.s.createVector(randomX, randomY)
+    this.originPoint = this.s.createVector(randomX, randomY)
   }
 
   identifyNeighbors(distance = 100) {
@@ -211,19 +204,19 @@ export class BaseVehicle {
 
   get csvRecord() {
     let record = '\r\n'
-    if (this.geometryType == GeometryTypes.POINT) {
+    if (this.geometryType == ElementGeometryTypes.POINT) {
       try {
-        record = `${this.uuid},point,${this.basePoint.x},${this.basePoint.y}\r\n`
+        record = `${this.uuid},point,${this.originPoint.x},${this.originPoint.y}\r\n`
       } catch {
         record = `${this.uuid},ERROR,could not resolve point geometry\r\n`
       }
-    } else if (this.geometryType == GeometryTypes.LINE) {
+    } else if (this.geometryType == ElementGeometryTypes.LINE) {
       try {
-        record = `${this.uuid},line,${this.basePoint.x},${this.basePoint.y},${this.secondPoint.x},${this.secondPoint.y}\r\n`
+        record = `${this.uuid},line,${this.originPoint.x},${this.originPoint.y},${this.secondPoint.x},${this.secondPoint.y}\r\n`
       } catch {
         record = `${this.uuid},ERROR,could not resolve line geometry`
       }
-    } else if (this.geometryType == GeometryTypes.POLYLINE) {
+    } else if (this.geometryType == ElementGeometryTypes.POLYLINE) {
       try {
         record = ''
         for (let i in this.polylinePoints.items) {
@@ -240,10 +233,10 @@ export class BaseVehicle {
   }
 
   get x() {
-    return this.basePoint.x
+    return this.originPoint.x
   }
   get y() {
-    return this.basePoint.y
+    return this.originPoint.y
   }
   get xVel() {
     return this.velocity.x

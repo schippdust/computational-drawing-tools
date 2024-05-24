@@ -5,28 +5,28 @@ export class QuadTree {
     this.s = sketch
     this.boundary = boundary
     this.quadCapacity = quadCapacity
-    this.vehicles = []
+    this.elements = []
     this.divided = false
   }
 
-  insert(vehicle) {
-    if (!this.boundary.contains(vehicle.basePoint, true)) {
+  insert(element) {
+    if (!this.boundary.contains(element.originPoint, true)) {
       return false
     }
 
-    if (this.vehicles.length < this.quadCapacity) {
-      this.vehicles.push(vehicle)
-      vehicle.quadTree = this
+    if (this.elements.length < this.quadCapacity) {
+      this.elements.push(element)
+      element.quadTree = this
       return true
     } else {
       if (!this.divided) {
         this.subdivide()
       }
 
-      if (this.northeast.insert(vehicle)) return true
-      if (this.northwest.insert(vehicle)) return true
-      if (this.southeast.insert(vehicle)) return true
-      if (this.southwest.insert(vehicle)) return true
+      if (this.northeast.insert(element)) return true
+      if (this.northwest.insert(element)) return true
+      if (this.southeast.insert(element)) return true
+      if (this.southwest.insert(element)) return true
     }
   }
 
@@ -49,34 +49,34 @@ export class QuadTree {
     this.divided = true
   }
 
-  queryRange(searchVehicle, distance) {
+  queryRange(searchElement, distance) {
     let results = []
-    if (!this.boundary.intersectsCircle(searchVehicle.basePoint, distance)) {
+    if (!this.boundary.intersectsCircle(searchElement.originPoint, distance)) {
       return results
     }
 
-    for (let vehicle of this.vehicles) {
+    for (let element of this.elements) {
       if (
-        vehicle.uuid != searchVehicle.uuid &&
-        vehicle.basePoint.dist(searchVehicle.basePoint) <= distance
+        element.uuid != searchElement.uuid &&
+        element.originPoint.dist(searchElement.originPoint) <= distance
       ) {
-        results.push(vehicle)
+        results.push(element)
       }
     }
 
     if (this.divided) {
       // Recursively search the subnodes
       results = results.concat(
-        this.northeast.queryRange(searchVehicle, distance),
+        this.northeast.queryRange(searchElement, distance),
       )
       results = results.concat(
-        this.northwest.queryRange(searchVehicle, distance),
+        this.northwest.queryRange(searchElement, distance),
       )
       results = results.concat(
-        this.southeast.queryRange(searchVehicle, distance),
+        this.southeast.queryRange(searchElement, distance),
       )
       results = results.concat(
-        this.southwest.queryRange(searchVehicle, distance),
+        this.southwest.queryRange(searchElement, distance),
       )
     }
 
@@ -84,35 +84,35 @@ export class QuadTree {
   }
 
   getAllVehicles() {
-    let vehicles = []
+    let elements = []
 
-    vehicles = vehicles.concat(this.vehicles)
+    vehicles = elements.concat(this.elements)
 
     if (this.divided) {
-      vehicles = vehicles.concat(this.northeast.getAllVehicles())
-      vehicles = vehicles.concat(this.northwest.getAllVehicles())
-      vehicles = vehicles.concat(this.southeast.getAllVehicles())
-      vehicles = vehicles.concat(this.southwest.getAllVehicles())
+      elements = elements.concat(this.northeast.getAllVehicles())
+      elements = elements.concat(this.northwest.getAllVehicles())
+      elements = elements.concat(this.southeast.getAllVehicles())
+      elements = elements.concat(this.southwest.getAllVehicles())
     }
 
-    return vehicles
+    return elements
   }
 
-  deleteVehicle(vehicle) {
-    if (!this.boundary.contains(vehicle.basePoint)) {
+  deleteVehicle(element) {
+    if (!this.boundary.contains(element.originPoint)) {
       return false
     }
 
-    let index = this.vehicles.indexOf(vehicle)
+    let index = this.vehicles.indexOf(element)
     if (index !== -1) {
-      vehicle.quadTree = undefined
-      this.vehicles.filter((v) => v != vehicle)
+      element.quadTree = undefined
+      this.vehicles.filter((e) => e != element)
       return true
     } else if (this.divided) {
-      if (this.northeast.deleteVehicle(vehicle)) return true
-      if (this.northwest.deleteVehicle(vehicle)) return true
-      if (this.southeast.deleteVehicle(vehicle)) return true
-      if (this.southwest.deleteVehicle(vehicle)) return true
+      if (this.northeast.deleteVehicle(element)) return true
+      if (this.northwest.deleteVehicle(element)) return true
+      if (this.southeast.deleteVehicle(element)) return true
+      if (this.southwest.deleteVehicle(element)) return true
     } else {
       return false
     }
