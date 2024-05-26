@@ -4,16 +4,20 @@ import { BaseSketchElement } from './BaseSketchElement'
 import { QuadTree } from './QuadTree'
 
 export class AnalyticalGridCell extends BaseSketchElement {
-  constructor(sketch, x, y, w, h, i, j) {
+  constructor(sketch, x, y, w, h, i, j, params) {
     super(sketch, x + w / 2, y + h / 2)
     this.rectangle = Rectangle(sketch, x, y, w, h)
     this.i = i
     this.j = j
+    this.data = {}
+    for (let param of dataParams) {
+      this.data[param] = 0
+    }
   }
 }
 
 export class AnalyticalGrid extends BaseSketchElement {
-  constructor(sketch, cellDim) {
+  constructor(sketch, cellDim, numericalParams = ['eventCount']) {
     super(sketch, 0, 0)
 
     this.cellDim = cellDim
@@ -29,10 +33,10 @@ export class AnalyticalGrid extends BaseSketchElement {
     this.rowCount = undefined
     this.minX = undefined
     this.minY = undefined
-    this.instantiateCells()
+    this.instantiateCells(numericalParams)
   }
 
-  instantiateCells() {
+  instantiateCells(numericalParams) {
     this.xMargin = (width % cellDim) / 2
     this.yMargin = (height % cellDim) / 2
     let xCursor = this.xMargin
@@ -64,6 +68,7 @@ export class AnalyticalGrid extends BaseSketchElement {
           this.cellDim,
           i,
           j,
+          numericalParams,
         )
         columnCells.push(cell)
         yCursor += this.cellDim
@@ -71,6 +76,14 @@ export class AnalyticalGrid extends BaseSketchElement {
       this.cells.push(columnCells)
       yCursor = this.minY
       xCursor += this.cellDim
+    }
+  }
+
+  addNumericalParamToCells(param) {
+    for (let cell of this.cells) {
+      if (!param in cell.data) {
+        cell.data[param] = 0
+      }
     }
   }
 
@@ -95,7 +108,7 @@ export class AnalyticalGrid extends BaseSketchElement {
     }
   }
 
-  queryCellsByVehicles(vehicles) {
+  getCellsIntersectingVehicles(vehicles) {
     let identifiedCells = []
     if (!Array.isArray(vehicles)) {
       vehicles = [vehicles]
@@ -140,13 +153,34 @@ export class AnalyticalGrid extends BaseSketchElement {
     return neighborIndices
   }
 
-  getCellNeighbors(cell) {
+  getCellNeighbors(cell, includeSourceCell = false) {
     let indices = { i: cell.i, j: cell.j }
     let neighborIndices = getNeighborIndicesFromCellIndices(indices)
     let neighbors = []
+    if (includeSourceCell) {
+      neighbors.push(cell)
+    }
     neighborIndices.forEach((indices) => {
       neighbors.push(this.cells[indices.i][indices.j])
     })
     return neighbors
+  }
+
+  getMultipleCellNeighbors(cells, includeSourceCells = false) {
+    setOfNeighbors = []
+    for (let cell of cells) {
+      let cellNeighbors = this.getCellNeighbors(cell, includeSourceCells)
+      cellNeighbors.forEach((cell) => {
+        if (!setOfNeighbors.includes(cell)) {
+          setOfNeighbors.push(cell)
+        }
+      })
+    }
+    if (!includeSourceCells) {
+      setOfNeighbors.filter((neighbor) => {
+        return !cells.includes(neighbor)
+      })
+    }
+    return setOfNeighbors
   }
 }
