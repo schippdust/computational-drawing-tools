@@ -86,7 +86,7 @@ export class QuadTree {
   getAllVehicles() {
     let elements = []
 
-    vehicles = elements.concat(this.elements)
+    elements = elements.concat(this.elements)
 
     if (this.divided) {
       elements = elements.concat(this.northeast.getAllVehicles())
@@ -103,10 +103,10 @@ export class QuadTree {
       return false
     }
 
-    let index = this.vehicles.indexOf(element)
+    let index = this.elements.indexOf(element)
     if (index !== -1) {
       element.quadTree = undefined
-      this.vehicles.filter((e) => e != element)
+      this.elements.filter((e) => e != element)
       return true
     } else if (this.divided) {
       if (this.northeast.deleteVehicle(element)) return true

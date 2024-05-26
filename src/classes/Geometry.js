@@ -13,10 +13,10 @@ export class Rectangle {
   contains(point, tiled = false) {
     if (tiled) {
       return (
-        point.x >= this.x &&
-        point.x < this.x + this.w &&
-        point.y >= this.y &&
-        point.y < this.y + this.h
+        point.x > this.x &&
+        point.x <= this.x + this.w &&
+        point.y > this.y &&
+        point.y <= this.y + this.h
       )
     } else {
       return (
