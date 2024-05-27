@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import { useRouter } from 'vue-router'
-const router = useRouter()
+// import { useRouter } from 'vue-router'
+// const router = useRouter()
+import router from '@/router'
 import { saveP5CanvasAsImage, saveCsvData } from './storeUtils'
 
 if (localStorage.getItem('print iterations') == 'null') {
@@ -19,7 +20,7 @@ export const useUniveralStore = defineStore('univeralStore', {
     automatedPrintingEnabled: true,
     frameStepForPrinting: 250,
     minFrameForPrinting: 100,
-    maxFrameToStopPrinting: 2600,
+    maxFrameToStopPrinting: 2500,
     printToggleWatcher: false,
   }),
   actions: {

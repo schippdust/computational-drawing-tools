@@ -7,6 +7,10 @@ import { useUniveralStore } from '@/store/univeralStore'
 const univeralStore = useUniveralStore()
 const { playing, printToggleWatcher } = storeToRefs(univeralStore)
 
+import { useTracerStore } from '@/store/tracerStore'
+const tracerStore = useTracerStore()
+const { constrainOrthogonally } = storeToRefs(tracerStore)
+
 function saveImagePressed() {
   printToggleWatcher.value = !printToggleWatcher.value
 }
@@ -34,6 +38,20 @@ function saveImagePressed() {
         >
           <v-icon v-if="playing" class="ma-0">mdi-play</v-icon>
           <v-icon v-else class="ma-0">mdi-pause</v-icon>
+        </v-btn>
+      </v-col>
+
+      <v-col md="1" class="py-0 text-center">
+        <v-btn
+          class="pa-0"
+          fab
+          :color="constrainOrthogonally ? 'blue-darken-4' : 'blue-lighten-3'"
+          dark
+          title="Toggle Orthogonal Drawing"
+          @click="constrainOrthogonally = !constrainOrthogonally"
+        >
+          <v-icon v-if="constrainOrthogonally" class="ma-0">mdi-grid</v-icon>
+          <v-icon v-else class="ma-0">mdi-grid-off</v-icon>
         </v-btn>
       </v-col>
 

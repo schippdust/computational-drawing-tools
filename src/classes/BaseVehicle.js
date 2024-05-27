@@ -22,7 +22,10 @@ export class BaseVehicle extends BaseSketchElement {
 
     this.maxVelocity = 10
     this.maxSteerForce = 5
-    // this.maxAcceleration = 1 // not currently in use, consider implementing later if required
+
+    this.constrainOrthogonally = false
+    this.orthogonalDirections = 8
+    this.orthogonalRotationalOffset = 0 //in radians
 
     this.wanderRadius = 50
     this.wanderForwardRatio = 9 / 10
@@ -37,13 +40,26 @@ export class BaseVehicle extends BaseSketchElement {
       this.applyFriction()
     }
     this.velocity.add(this.acceleration).limit(this.maxVelocity)
-    this.originPoint.add(this.velocity)
+    if (this.constrainOrthogonally == false) {
+      this.originPoint.add(this.velocity)
+    } else {
+      let angleBetweenOrthos = (Math.PI * 2) / this.orthogonalDirections
+      let comparisonVector = this.s
+        .createVector(1, 0)
+        .rotate(this.orthogonalRotationalOffset)
+      let comparison = comparisonVector.angleBetween(this.velocity)
+      let nearestIncrement = Math.round(comparison / angleBetweenOrthos)
+      comparisonVector.rotate(nearestIncrement * angleBetweenOrthos)
+      comparisonVector.setMag(
+        Math.cos(comparison % angleBetweenOrthos) * this.velocity.mag(),
+      )
+      this.originPoint.add(comparisonVector)
+    }
     if (this.velocity.mag() < 0.00001) {
       this.velocity.mult(0)
     }
     this.acceleration.mult(0)
     this.polylinePoints.push(this.originPoint.copy())
-
     this.neighbors = []
   }
 

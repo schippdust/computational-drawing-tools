@@ -11,7 +11,8 @@ const { playing, printToggleWatcher } = storeToRefs(universalStore)
 
 import { useTracerStore } from '@/store/tracerStore'
 const tracerStore = useTracerStore()
-const { canvasWidth, canvasHeight } = storeToRefs(tracerStore)
+const { canvasWidth, canvasHeight, constrainOrthogonally } =
+  storeToRefs(tracerStore)
 
 var movingTarget = undefined
 let tracers = []
@@ -23,7 +24,7 @@ var sketch = (s) => {
     s.frameRate(30)
     console.log('setup complete', s)
 
-    movingTarget = new MovingTarget(s, 20)
+    movingTarget = new MovingTarget(s, 20, constrainOrthogonally.value)
     movingTarget.wanderRadius = 80
     movingTarget.coefOfFrict = 0.3
     movingTarget.wanderForwardRatio = 0.7
@@ -32,7 +33,7 @@ var sketch = (s) => {
     movingTarget.randomizeLocation()
 
     for (let i = 0; i < 50; i++) {
-      let tracer = new Tracer(s)
+      let tracer = new Tracer(s, 0, 0, constrainOrthogonally.value)
       tracer.maxVelocity = 30
       tracer.maxSteerForce = 3
       tracer.coefOfFrict = s.random(0.5, 0.8)
@@ -68,6 +69,12 @@ watch(playing, () => {
   } else {
     activeSketch.noLoop()
   }
+})
+
+watch(constrainOrthogonally, () => {
+  tracers.forEach((t) => {
+    t.constrainOrthogonally = constrainOrthogonally.value
+  })
 })
 
 watch(printToggleWatcher, () => {

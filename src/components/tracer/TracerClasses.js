@@ -3,8 +3,15 @@ import { ElementGeometryTypes } from '@/classes/BaseSketchElement'
 import P5 from 'p5'
 
 export class MovingTarget extends BaseVehicle {
-  constructor(sketch, targetRadius = 10, x = 0, y = 0) {
+  constructor(
+    sketch,
+    targetRadius = 10,
+    x = 0,
+    y = 0,
+    constrainOrthogonally = false,
+  ) {
     super(sketch, x, y)
+    this.constrainOrthogonally = constrainOrthogonally
     this.randomizeLocation()
     this.targetRadius = targetRadius
     this.boundsMin = this.s.createVector(this.s.width / 4, this.s.height / 4)
@@ -24,6 +31,10 @@ export class MovingTarget extends BaseVehicle {
 }
 
 export class Tracer extends BaseVehicle {
+  constructor(sketch, x = 0, y = 0, constrainOrthogonally = false) {
+    super(sketch, x, y)
+    this.constrainOrthogonally = constrainOrthogonally
+  }
   geometryType = ElementGeometryTypes.POLYLINE
   draw() {
     this.update()
