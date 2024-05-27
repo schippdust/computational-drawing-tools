@@ -13,6 +13,9 @@ export class BaseVehicle extends BaseSketchElement {
     this.secondPoint = undefined //useful for extension, can export to csv as line between two points
     this.geometryType = ElementGeometryTypes.POINT
     this.polylinePoints = new LimitedArray(20) //useful for extension, can export to csv as polyline between two points
+    this.lifeExpectancy = undefined
+    this.age = 0
+    this.expired = false
 
     this.velocity = this.s.createVector(0, 0)
     this.coefOfFrict = 0.7
@@ -61,6 +64,7 @@ export class BaseVehicle extends BaseSketchElement {
     this.acceleration.mult(0)
     this.polylinePoints.push(this.originPoint.copy())
     this.neighbors = []
+    this.age += 1
   }
 
   applyForce(force = this.s.createVector(0, 0)) {

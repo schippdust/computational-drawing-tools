@@ -4,7 +4,7 @@ import { onMounted, onUnmounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import { MovingTarget, Tracer } from '@/components/tracer/TracerClasses.js'
-
+import { VehicleCollection } from '@/classes/VehicleCollection.js'
 import { useUniveralStore } from '@/store/univeralStore'
 const universalStore = useUniveralStore()
 const { playing, printToggleWatcher } = storeToRefs(universalStore)
@@ -15,7 +15,7 @@ const { canvasWidth, canvasHeight, constrainOrthogonally } =
   storeToRefs(tracerStore)
 
 var movingTarget = undefined
-let tracers = []
+let tracers = new VehicleCollection()
 var activeSketch = undefined
 var sketch = (s) => {
   s.setup = () => {
