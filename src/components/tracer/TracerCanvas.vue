@@ -8,7 +8,7 @@ import { VehicleCollection } from '@/classes/VehicleCollection.js'
 import { useUniveralStore } from '@/store/univeralStore'
 const universalStore = useUniveralStore()
 const { playing, printToggleWatcher } = storeToRefs(universalStore)
-
+playing.value = true
 import { useTracerStore } from '@/store/tracerStore'
 const tracerStore = useTracerStore()
 const { canvasWidth, canvasHeight, constrainOrthogonally } =

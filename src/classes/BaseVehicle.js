@@ -200,6 +200,19 @@ export class BaseVehicle extends BaseSketchElement {
     this.seakAtMaxVelocity(targetPoint)
   }
 
+  align(otherVehicles = this.neighbors) {
+    if (otherVehicles.length == 0) {
+      return
+    }
+    let sumVect = s.createVector(0, 0)
+    for (let v of otherVehicles) {
+      sumVect.add(v.velocity)
+    }
+    sumVect.div(otherVehicles.length)
+    alignTarget = P5.Vector.add(this.originPoint, sumVect)
+    this.seakAtMaxVelocity(alignTarget)
+  }
+
   randomizeLocation() {
     let randomX = this.s.random(0, this.s.width)
     let randomY = this.s.random(0, this.s.height)
