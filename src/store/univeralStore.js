@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-// import { useRouter } from 'vue-router'
-// const router = useRouter()
+import { useRouter } from 'vue-router'
+const vueRouter = useRouter()
 import router from '@/router'
 import { saveP5CanvasAsImage, saveCsvData } from './storeUtils'
 
@@ -17,10 +17,10 @@ export const useUniveralStore = defineStore('univeralStore', {
       ? JSON.parse(localStorage.getItem('print iterations'))
       : 0,
     maxIterations: 25,
-    automatedPrintingEnabled: true,
+    automatedPrintingEnabled: false,
     frameStepForPrinting: 250,
     minFrameForPrinting: 100,
-    maxFrameToStopPrinting: 2500,
+    maxFrameToStopPrinting: 1000,
     printToggleWatcher: false,
   }),
   actions: {
@@ -78,6 +78,9 @@ export const useUniveralStore = defineStore('univeralStore', {
         this.addVehiclesToCsvRecord(vehicles)
       }
       this.saveDrawingRecord(fileName, savePng, saveCsv)
+    },
+    reloadPage() {
+      router.go()
     },
   },
 })

@@ -5,11 +5,15 @@ import { storeToRefs } from 'pinia'
 
 import { MovingTarget, Tracer } from '@/components/tracer/TracerClasses.js'
 import { VehicleCollection } from '@/classes/VehicleCollection.js'
+import { QuadTree } from '@/classes/QuadTree'
+
 import { useUniveralStore } from '@/store/univeralStore'
 const universalStore = useUniveralStore()
 const { playing, printToggleWatcher } = storeToRefs(universalStore)
 playing.value = true
+
 import { useTracerStore } from '@/store/tracerStore'
+import { Rectangle } from '@/classes/Geometry'
 const tracerStore = useTracerStore()
 const { canvasWidth, canvasHeight, constrainOrthogonally } =
   storeToRefs(tracerStore)
@@ -17,6 +21,7 @@ const { canvasWidth, canvasHeight, constrainOrthogonally } =
 var movingTarget = undefined
 let tracers = new VehicleCollection()
 var activeSketch = undefined
+var neighborDistance = 200
 var sketch = (s) => {
   s.setup = () => {
     s.createCanvas(canvasWidth.value, canvasHeight.value)
@@ -50,8 +55,18 @@ var sketch = (s) => {
     s.background(0)
     movingTarget.wander()
     movingTarget.draw()
+
+    let quadTreeBounds = new Rectangle(s)
+    let quadTree = new QuadTree(s, quadTreeBounds)
+    tracers.forEach((tracer) => {
+      quadTree.insert(tracer)
+    })
+    tracers.forEach((tracer) => {
+      tracer.neighbors = quadTree.queryRange(tracer, neighborDistance)
+    })
     tracers.forEach((tracer) => {
       tracer.seakAtMaxVelocity(movingTarget.originPoint)
+      tracer.flock()
       tracer.draw()
     })
 

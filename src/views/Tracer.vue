@@ -5,7 +5,8 @@ import { storeToRefs } from 'pinia'
 
 import { useUniveralStore } from '@/store/univeralStore'
 const univeralStore = useUniveralStore()
-const { playing, printToggleWatcher } = storeToRefs(univeralStore)
+const { playing, printToggleWatcher, automatedPrintingEnabled } =
+  storeToRefs(univeralStore)
 
 import { useTracerStore } from '@/store/tracerStore'
 const tracerStore = useTracerStore()
@@ -20,12 +21,40 @@ function saveImagePressed() {
   <v-container>
     <v-row justify="start" class="pa-1 mt-n4">
       <v-col md="1" class="py-0 text-center">
+        <v-btn
+          class="pa-0"
+          fab
+          color="grey"
+          dark
+          title="Reload Sketch"
+          @click=""
+        >
+          <v-icon class="ma-0" @click="univeralStore.reloadPage()"
+            >mdi-reload</v-icon
+          >
+        </v-btn>
+      </v-col>
+
+      <v-col md="1" class="py-0 text-center">
         <v-btn class="pa-0" fab color="blue" dark title="Save Image" @click="">
           <v-icon class="ma-0" @click="saveImagePressed()">mdi-download</v-icon>
         </v-btn>
       </v-col>
 
       <v-divider vertical />
+
+      <v-col md="1" class="py-0 text-center">
+        <v-btn
+          class="pa-0"
+          fab
+          :color="automatedPrintingEnabled ? 'green' : 'orange'"
+          dark
+          title="Automated Printing"
+          @click="automatedPrintingEnabled = !automatedPrintingEnabled"
+        >
+          <v-icon class="ma-0">mdi-robot-outline</v-icon>
+        </v-btn>
+      </v-col>
 
       <v-col md="1" class="py-0 text-center">
         <v-btn
@@ -40,6 +69,8 @@ function saveImagePressed() {
           <v-icon v-else class="ma-0">mdi-pause</v-icon>
         </v-btn>
       </v-col>
+
+      <v-divider vertical />
 
       <v-col md="1" class="py-0 text-center">
         <v-btn
