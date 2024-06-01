@@ -153,6 +153,28 @@ export class BaseVehicle extends BaseSketchElement {
     this.applyForce(steer)
   }
 
+  avoid(
+    targetPosition = this.s.createVector(0, 0),
+    desiredClosestDistance = 100,
+    multiplier = 1,
+  ) {
+    let distanceBetween = P5.Vector.dist(this.originPoint, targetPosition)
+    if (distanceBetween > desiredClosestDistance) {
+      return
+    } else {
+      let steerDirection = P5.Vector.sub(
+        this.originPoint,
+        targetPosition,
+      ).normalize()
+      if (distanceBetween == 0) {
+        distanceBetween = 0.001
+      }
+      let closenessRatio = distanceBetween / desiredClosestDistance
+      steerDirection.div(closenessRatio)
+      this.steer(steerDirection, multiplier)
+    }
+  }
+
   steerToWithinBounds(min = this.sketchMin, max = this.sketchMax) {
     let aboveBounds = false
     let belowBounds = false
