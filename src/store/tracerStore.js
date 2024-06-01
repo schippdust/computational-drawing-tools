@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 export const useTracerStore = defineStore('tracerStore', {
   state: () => ({
-    canvasWidth: 1500,
-    canvasHeight: 1500,
+    canvasWidth: 3200,
+    canvasHeight: 3200,
     constrainOrthogonally: false,
   }),
 })

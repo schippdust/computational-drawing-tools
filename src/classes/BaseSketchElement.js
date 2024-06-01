@@ -16,5 +16,11 @@ export class BaseSketchElement {
 
     this.quadTree = undefined
     this.neighbors = []
+
+    this.sketchMin = this.s.createVector(this.s.width / 4, this.s.height / 4)
+    this.sketchMax = this.s.createVector(
+      this.s.width * (3 / 4),
+      this.s.height * (3 / 4),
+    )
   }
 }

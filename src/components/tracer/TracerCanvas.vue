@@ -22,6 +22,7 @@ var movingTarget = undefined
 let tracers = new VehicleCollection()
 var activeSketch = undefined
 var neighborDistance = 200
+let numberOfTracers = 500
 var sketch = (s) => {
   s.setup = () => {
     s.createCanvas(canvasWidth.value, canvasHeight.value)
@@ -29,7 +30,7 @@ var sketch = (s) => {
     s.frameRate(30)
     console.log('setup complete', s)
 
-    movingTarget = new MovingTarget(s, 20, constrainOrthogonally.value)
+    movingTarget = new MovingTarget(s, 20)
     movingTarget.wanderRadius = 80
     movingTarget.coefOfFrict = 0.3
     movingTarget.wanderForwardRatio = 0.7
@@ -37,12 +38,13 @@ var sketch = (s) => {
     movingTarget.maxWanderAdjustment = (2 * Math.PI) / 20
     movingTarget.randomizeLocation()
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < numberOfTracers; i++) {
       let tracer = new Tracer(s, 0, 0, constrainOrthogonally.value)
       tracer.maxVelocity = 30
       tracer.maxSteerForce = 3
       tracer.coefOfFrict = s.random(0.5, 0.8)
-      tracer.polylinePoints.maxLength = 750
+      tracer.polylinePoints.maxLength = 150
+      tracer.desiredSeparation = 50
       tracer.randomizeLocation()
       tracers.push(tracer)
     }
@@ -54,6 +56,11 @@ var sketch = (s) => {
     }
     s.background(0)
     movingTarget.wander()
+    movingTarget.steerToWithinBounds(
+      movingTarget.boundsMin,
+      movingTarget.boundsMax,
+    )
+    movingTarget.applyAggregateSteerForce()
     movingTarget.draw()
 
     let quadTreeBounds = new Rectangle(s)
@@ -66,7 +73,8 @@ var sketch = (s) => {
     })
     tracers.forEach((tracer) => {
       tracer.seakAtMaxVelocity(movingTarget.originPoint)
-      tracer.flock()
+      tracer.flock(100, 0, 0)
+      tracer.applyAggregateSteerForce()
       tracer.draw()
     })
 

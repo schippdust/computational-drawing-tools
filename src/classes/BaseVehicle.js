@@ -17,6 +17,7 @@ export class BaseVehicle extends BaseSketchElement {
     this.age = 0
     this.expired = false
 
+    this.aggregateSteer = this.s.createVector(0, 0)
     this.velocity = this.s.createVector(0, 0)
     this.coefOfFrict = 0.7
 
@@ -70,9 +71,11 @@ export class BaseVehicle extends BaseSketchElement {
   applyForce(force = this.s.createVector(0, 0)) {
     let acceleration = P5.Vector.div(force, this.mass)
     this.acceleration.add(acceleration)
-    if (this.acceleration.mag() < 0.00001) {
-      this.acceleration.mult(0)
-    }
+  }
+
+  applyAggregateSteerForce() {
+    this.applyForce(this.aggregateSteer.limit(this.maxSteerForce))
+    this.aggregateSteer = this.s.createVector(0, 0)
   }
 
   applyFriction() {
@@ -84,10 +87,21 @@ export class BaseVehicle extends BaseSketchElement {
 
   seakAtMaxVelocity(targetPosition = this.s.createVector(0, 0)) {
     let desiredVelocity = P5.Vector.sub(targetPosition, this.originPoint)
-    desiredVelocity.normalize().mult(this.maxVelocity)
-    let steer = P5.Vector.sub(desiredVelocity, this.velocity)
-    steer.limit(this.maxSteerForce)
-    this.applyForce(steer)
+    this.steer(desiredVelocity, this.maxVelocity)
+  }
+
+  seak(targetPosition = this.s.createVector(0, 0), multiplier = 1) {
+    let desiredVelocity = P5.Vector.sub(targetPosition, this.originPoint)
+    this.steer(desiredVelocity, multiplier)
+  }
+
+  steer(direction = this.s.createVector(0, 0), multiplier = 1) {
+    if (direction.mag() == 0) {
+      return
+    }
+    direction.mult(multiplier)
+    let steer = P5.Vector.sub(direction, this.velocity)
+    this.aggregateSteer.add(steer)
   }
 
   wander() {
@@ -139,10 +153,7 @@ export class BaseVehicle extends BaseSketchElement {
     this.applyForce(steer)
   }
 
-  steerToWithinBounds(
-    min = this.s.createVector(0, 0),
-    max = this.s.createVector(this.s.width, this.s.height),
-  ) {
+  steerToWithinBounds(min = this.sketchMin, max = this.sketchMax) {
     let aboveBounds = false
     let belowBounds = false
     let leftOfBounds = false
@@ -176,31 +187,32 @@ export class BaseVehicle extends BaseSketchElement {
     this.seakAtMaxVelocity(target)
   }
 
-  separate(otherVehicles = this.neighbors) {
+  separate(otherVehicles = this.neighbors, separateMultiplier = 0.5) {
+    if (otherVehicles.length <= 0) {
+      return
+    }
     let countOfVehiclesTooClose = 0
-    let sumOfSeparateVects = this.s.createVector(0, 0)
-
+    let sumVect = this.s.createVector(0, 0)
+    let sumOfDistance = 0
     for (let v of otherVehicles) {
       let d = P5.Vector.dist(this.originPoint, v.originPoint)
-
+      sumOfDistance += d
       if (d > 0 && d < this.desiredSeparation) {
         let diff = P5.Vector.sub(this.originPoint, v.originPoint)
           .normalize()
           .div(d)
-        sumOfSeparateVects.add(diff)
+        sumVect.add(diff)
         countOfVehiclesTooClose += 1
       }
     }
-
     if (countOfVehiclesTooClose > 0) {
-      sumOfSeparateVects.div(countOfVehiclesTooClose)
+      sumVect.mult(sumOfDistance / countOfVehiclesTooClose)
     }
 
-    let targetPoint = P5.Vector.add(this.originPoint, sumOfSeparateVects)
-    this.seakAtMaxVelocity(targetPoint)
+    this.steer(sumVect, separateMultiplier)
   }
 
-  align(otherVehicles = this.neighbors) {
+  align(otherVehicles = this.neighbors, alignMultiplier = 5) {
     if (otherVehicles.length <= 0) {
       return
     }
@@ -209,11 +221,11 @@ export class BaseVehicle extends BaseSketchElement {
       sumVect.add(v.velocity)
     }
     sumVect.div(otherVehicles.length)
-    let alignTarget = P5.Vector.add(this.originPoint, sumVect)
-    this.seakAtMaxVelocity(alignTarget)
+
+    this.steer(sumVect, alignMultiplier)
   }
 
-  cohere(otherVehicles = this.neighbors) {
+  cohere(otherVehicles = this.neighbors, cohereMultiplier = 5) {
     if (otherVehicles.length <= 0) {
       return
     }
@@ -222,13 +234,13 @@ export class BaseVehicle extends BaseSketchElement {
       sumVect.add(v.originPoint)
     }
     sumVect.div(otherVehicles.length)
-    this.seakAtMaxVelocity(sumVect)
+    this.seak(sumVect, cohereMultiplier)
   }
 
-  flock() {
-    this.separate()
-    this.align()
-    this.cohere()
+  flock(separateMult = 0.5, alignMult = 0.5, cohereMult = 5) {
+    this.separate(this.neighbors, separateMult)
+    this.align(this.neighbors, alignMult)
+    this.cohere(this.neighbors, cohereMult)
   }
 
   randomizeLocation() {
