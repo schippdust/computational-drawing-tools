@@ -6,6 +6,7 @@ export const VehicleActions = Object.freeze({
 })
 
 import { BaseSketchElement, ElementGeometryTypes } from './BaseSketchElement'
+import { LinkRecord, PolylineRecord } from './GeometryRecords'
 
 export class BaseVehicle extends BaseSketchElement {
   constructor(sketch, x = 0, y = 0) {
@@ -290,27 +291,18 @@ export class BaseVehicle extends BaseSketchElement {
   get csvRecord() {
     let record = '\r\n'
     if (this.geometryType == ElementGeometryTypes.POINT) {
-      try {
-        record = `${this.uuid},point,${this.originPoint.x},${this.originPoint.y}\r\n`
-      } catch {
-        record = `${this.uuid},ERROR,could not resolve point geometry\r\n`
-      }
+      record = PointRecord.createCsvRecord(this.uuid, this.originPoint)
     } else if (this.geometryType == ElementGeometryTypes.LINE) {
-      try {
-        record = `${this.uuid},line,${this.originPoint.x},${this.originPoint.y},${this.secondPoint.x},${this.secondPoint.y}\r\n`
-      } catch {
-        record = `${this.uuid},ERROR,could not resolve line geometry`
-      }
+      record = LinkRecord.createCsvRecord(
+        this.uuid,
+        this.originPoint,
+        this.secondPoint,
+      )
     } else if (this.geometryType == ElementGeometryTypes.POLYLINE) {
-      try {
-        record = ''
-        for (let i in this.polylinePoints.items) {
-          let v = this.polylinePoints.items[i]
-          record += `${this.uuid},polyline control point,${i},${v.x},${v.y}\r\n`
-        }
-      } catch {
-        record = `${this.uuid},ERROR,could not resolve polyline geometry`
-      }
+      record = PolylineRecord.createCsvRecord(
+        this.uuid,
+        this.polylinePoints.items,
+      )
     } else {
       record = `${this.uuid},ERROR,geometry type enum did not match draw condition`
     }
