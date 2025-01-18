@@ -38,6 +38,7 @@ export class BaseVehicle extends BaseSketchElement {
     this.wanderPointRadians = this.s.random(0, 2 * Math.PI)
 
     this.desiredSeparation = 40
+    this.neighbors = []
   }
 
   update(applyFriction = true) {
@@ -219,8 +220,9 @@ export class BaseVehicle extends BaseSketchElement {
     let sumOfDistance = 0
     for (let v of otherVehicles) {
       let d = P5.Vector.dist(this.originPoint, v.originPoint)
-      sumOfDistance += d
+      
       if (d > 0 && d < this.desiredSeparation) {
+        sumOfDistance += d
         let diff = P5.Vector.sub(this.originPoint, v.originPoint)
           .normalize()
           .div(d)

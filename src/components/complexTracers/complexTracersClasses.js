@@ -1,7 +1,11 @@
 import { BaseVehicle } from '@/classes/BaseVehicle'
 import { createUUID } from '@/store/storeUtils'
 import { ElementGeometryTypes } from '@/classes/BaseSketchElement'
+import { LinkRecord } from '@/classes/GeometryRecords'
+
 import P5 from 'p5'
+import { Target, TargetTypes } from '@/classes/Target'
+import { VehicleCollection } from '@/classes/VehicleCollection'
 export class ConnectedWanderer extends BaseVehicle {
   constructor(sketch) {
     super(sketch)
@@ -43,21 +47,65 @@ export class ConnectedWanderer extends BaseVehicle {
   }
 }
 
-export class LinkRecord {
-  constructor(log, pt1, pt2) {
-    this.uuid = createUUID()
-    this.log = log
-    this.startPoint = P5.Vector.copy(pt1)
-    this.endPoint = P5.Vector.copy(pt2)
+export class AttractorTargets extends Target {
+  constructor(sketch, targetRadius = 400, targetType = TargetTypes.ATTRACTOR) {
+    super(sketch, targetRadius, targetType)
+  }
+}
+
+export class AvoidanceTargets extends Target {
+  constructor(sketch, targetRadius = 100, targettype = TargetTypes.REPELLER) {
+    super(sketch, targetRadius, targetType)
+  }
+}
+
+export class TracerGenerator extends Target {
+  constructor(
+    sketch,
+    vehicleCollection,
+    x,
+    y,
+    tracerLifespan=100,
+    pointGenOffset=40,
+    numberOfPoints=10,
+    targetRadius = 300,
+    targetType = TargetTypes.REPELLER,
+  ) {
+    super(sketch, targetRadius, targetType, x, y)
+
+    this.pointGenOffset = pointGenOffset
+    this.numberOfPoints = numberOfPoints
+    this.globalVehicleCollection = vehicleCollection
+    this.vehicles = new VehicleCollection(this.s)
+
+    for (let i = 0; i < this.numberOfPoints; i++){
+      let rotation = i * ((Math.PI * 2)/this.numberOfPoints)
+      let tracerX = x + Math.cos(rotation) * targetRadius
+      let tracerY = y + Math.sin(rotation) * targetRadius
+      let tracer = new ComplexTracer(this.s,tracerX,tracerY)
+      this.vehicles.push(tracer)
+      this.globalVehicleCollection.push(tracer)
+    }
+
+  }
+}
+
+export class ComplexTracer extends BaseVehicle {
+  constructor(sketch, x, y) {
+    super(sketch, x, y)
+    this.geometryType = ElementGeometryTypes.POLYLINE
+    this.avoidanceTargets = []
+    
   }
 
-  get csvRecord() {
-    let record = '\r\n'
-    try {
-      record = `${this.uuid},link,${this.log},${this.startPoint.x},${this.startPoint.y},${this.endPoint.x},${this.endPoint.y}\r\n`
-    } catch {
-      record = `${this.uuid},ERROR,could not resolve point geometry\r\n`
+  draw() {
+    this.update()
+    if (this.polylinePoints.length > 1) {
+      for (let i = 0; i < this.polylinePoints.length - 1; i++) {
+        let pt1 = this.polylinePoints.items[i]
+        let pt2 = this.polylinePoints.items[i + 1]
+        this.s.line(pt1.x, pt1.y, pt2.x, pt2.y)
+      }
     }
-    return record
   }
 }
