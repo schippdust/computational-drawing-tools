@@ -6,7 +6,6 @@ import { storeToRefs } from 'pinia'
 import { useUniveralStore } from '@/store/univeralStore'
 const univeralStore = useUniveralStore()
 const { playing, printToggleWatcher } = storeToRefs(univeralStore)
-playing.value = true
 
 //IMPORT CLASSES ASSOCIATED WITH DRAWING
 import { ConnectedWanderer } from './complexTracersClasses'
@@ -37,15 +36,13 @@ var sketch = (s) => {
   }
 
   s.draw = () => {
-    let connectionsLog = []
+    // console.log('drawing')
+
     if (s.frameCount % 50 == 0) {
       console.log(s.frameCount)
     }
-    vehicles.forEach((v) => {
-      v.wander()
-      v.steerToWithinBounds()
-      v.update()
-    })
+    // console.log(vehicles.length)
+
     let quadTreeBounds = new Rectangle(s)
     let quadTree = new QuadTree(s, quadTreeBounds)
     vehicles.forEach((v) => {
@@ -55,20 +52,27 @@ var sketch = (s) => {
       v.neighbors = quadTree.queryRange(v, 200)
     })
     vehicles.forEach((v) => {
-      let newLinkRecords = v.draw(connectionsLog)
-      connectionsLog = [...connectionsLog, ...newLinkRecords.map((r) => r.log)]
-      linkRecords = [...linkRecords, ...newLinkRecords]
+      // console.log(v)
+      // v.wander()
+      v.flock(150, 50, 5)
+      v.steerToWithinBounds()
+      v.applyAggregateSteerForce()
+    })
+    vehicles.forEach((v) => {
+      let connectionsLog = []
+      v.draw(connectionsLog)
+      linkRecords = [...linkRecords, ...connectionsLog]
     })
 
     //update elements
 
-    univeralStore.automatedPrint(
-      s.frameCount,
-      linkRecords,
-      sketchName.value,
-      true,
-      true,
-    )
+    // univeralStore.automatedPrint(
+    //   s.frameCount,
+    //   linkRecords,
+    //   sketchName.value,
+    //   true,
+    //   true,
+    // )
   }
 }
 
@@ -85,10 +89,11 @@ watch(playing, () => {
 })
 
 watch(printToggleWatcher, () => {
-  univeralStore.print(vehicles, sketchName.value, true, false)
+  univeralStore.print(vehicles, sketchName.value, true, true)
 })
 
 onUnmounted(() => {
+  playing.value = true
   console.log('unmounting')
   activeSketch.remove()
 })

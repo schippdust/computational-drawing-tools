@@ -1,6 +1,6 @@
 import P5 from 'p5'
 import { LimitedArray } from './UtilityClasses'
-
+import { PointRecord } from './GeometryRecords'
 export const VehicleActions = Object.freeze({
   STEER: 0,
 })
@@ -107,6 +107,7 @@ export class BaseVehicle extends BaseSketchElement {
   }
 
   wander() {
+    // console.log('wandering')
     let circleCenter = undefined
     if (this.velocity.mag() == 0) {
       circleCenter = this.originPoint
@@ -220,7 +221,7 @@ export class BaseVehicle extends BaseSketchElement {
     let sumOfDistance = 0
     for (let v of otherVehicles) {
       let d = P5.Vector.dist(this.originPoint, v.originPoint)
-      
+
       if (d > 0 && d < this.desiredSeparation) {
         sumOfDistance += d
         let diff = P5.Vector.sub(this.originPoint, v.originPoint)
@@ -274,21 +275,21 @@ export class BaseVehicle extends BaseSketchElement {
     this.originPoint = this.s.createVector(randomX, randomY)
   }
 
-  identifyNeighbors(distance = 100) {
-    if (distance < this.desiredSeparation) {
-      console.log(
-        'WARNING: NEIGHBOR DISTANCE IS LESS THAN DESIRED SEPARATION, THIS MAY CAUSE UNINTENDED BEHAVIORS',
-      )
-    }
-    if (this.quadTree) {
-      return this.quadTree.queryRange(this, distance)
-    } else {
-      console.log(
-        'WARNING: no quad tree was defined when searching for neighbors',
-      )
-      return []
-    }
-  }
+  // identifyNeighbors(distance = 100) {
+  //   if (distance < this.desiredSeparation) {
+  //     console.log(
+  //       'WARNING: NEIGHBOR DISTANCE IS LESS THAN DESIRED SEPARATION, THIS MAY CAUSE UNINTENDED BEHAVIORS',
+  //     )
+  //   }
+  //   if (this.quadTree) {
+  //     return this.quadTree.queryRange(this, distance)
+  //   } else {
+  //     console.log(
+  //       'WARNING: no quad tree was defined when searching for neighbors',
+  //     )
+  //     return []
+  //   }
+  // }
 
   get csvRecord() {
     let record = '\r\n'

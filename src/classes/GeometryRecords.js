@@ -1,4 +1,5 @@
 import { createUUID } from '@/store/storeUtils'
+import P5 from 'p5'
 
 export class PointRecord {
   constructor(log, pt) {

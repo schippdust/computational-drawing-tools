@@ -21,8 +21,13 @@ export class ConnectedWanderer extends BaseVehicle {
 
   draw(connectionsLog) {
     let records = []
+    this.s.stroke(255, 255, 255, 50)
+    this.s.fill(0, 0, 0, 0)
+    this.s.circle(this.x, this.y, 2)
+
     this.s.stroke(255)
     this.s.fill(0)
+
     for (let neighbor of this.neighbors) {
       let connectionIds = [this.uuid, neighbor.uuid]
       connectionIds.sort()
@@ -42,7 +47,7 @@ export class ConnectedWanderer extends BaseVehicle {
         )
       }
     }
-    // this.s.circle(this.originPoint.x, this.originPoint.y, 2)
+    this.update()
     return records
   }
 }
@@ -65,9 +70,9 @@ export class TracerGenerator extends Target {
     vehicleCollection,
     x,
     y,
-    tracerLifespan=100,
-    pointGenOffset=40,
-    numberOfPoints=10,
+    tracerLifespan = 100,
+    pointGenOffset = 40,
+    numberOfPoints = 10,
     targetRadius = 300,
     targetType = TargetTypes.REPELLER,
   ) {
@@ -78,15 +83,14 @@ export class TracerGenerator extends Target {
     this.globalVehicleCollection = vehicleCollection
     this.vehicles = new VehicleCollection(this.s)
 
-    for (let i = 0; i < this.numberOfPoints; i++){
-      let rotation = i * ((Math.PI * 2)/this.numberOfPoints)
+    for (let i = 0; i < this.numberOfPoints; i++) {
+      let rotation = i * ((Math.PI * 2) / this.numberOfPoints)
       let tracerX = x + Math.cos(rotation) * targetRadius
       let tracerY = y + Math.sin(rotation) * targetRadius
-      let tracer = new ComplexTracer(this.s,tracerX,tracerY)
+      let tracer = new ComplexTracer(this.s, tracerX, tracerY)
       this.vehicles.push(tracer)
       this.globalVehicleCollection.push(tracer)
     }
-
   }
 }
 
@@ -95,7 +99,6 @@ export class ComplexTracer extends BaseVehicle {
     super(sketch, x, y)
     this.geometryType = ElementGeometryTypes.POLYLINE
     this.avoidanceTargets = []
-    
   }
 
   draw() {
