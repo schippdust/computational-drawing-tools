@@ -43,6 +43,12 @@ export const defaultPageData = [
     component: 'ComplexTracers',
     description: '',
   },
+  {
+    title: 'Connections Experiments',
+    path:'connections-two',
+    component: 'ConnectionsExperiments',
+    description:'trying to make something cool',
+  }
 ]
 
 export const useAppStore = defineStore('app', {
